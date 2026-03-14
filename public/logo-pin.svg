@@ -1,0 +1,15 @@
+<svg width="348" height="588" viewBox="0 0 348 588" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Main outer circle -->
+  <circle cx="174" cy="174" r="159" stroke="#B8845F" stroke-width="30" fill="none"/>
+  <!-- Middle circle -->
+  <circle cx="174" cy="174" r="82" stroke="#B8845F" stroke-width="30" fill="none"/>
+  <!-- Center dot -->
+  <circle cx="174" cy="174" r="21" fill="#B8845F"/>
+  <!-- Pin point - left side -->
+  <path d="M 174 333 L 174 573 L 96 458 L 174 333 Z" stroke="#B8845F" stroke-width="30" fill="none" stroke-linejoin="round"/>
+  <!-- Pin point - right side -->
+  <path d="M 174 333 L 174 573 L 252 458 L 174 333 Z" stroke="#B8845F" stroke-width="30" fill="none" stroke-linejoin="round"/>
+  <!-- Light accent lines -->
+  <line x1="290" y1="50" x2="320" y2="140" stroke="#B8845F" stroke-width="18" stroke-linecap="round" opacity="0.8"/>
+  <line x1="290" y1="50" x2="350" y2="90" stroke="#B8845F" stroke-width="18" stroke-linecap="round" opacity="0.8"/>
+</svg>

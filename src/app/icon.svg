@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 348 444" fill="none">
+  <!-- Outer pin body -->
+  <path
+    d="M174 18
+       C97 18 34 81 34 158
+       C34 224 80 278 174 418
+       C268 278 314 224 314 158
+       C314 81 251 18 174 18 Z"
+    stroke="#B8845F" stroke-width="28" fill="none" stroke-linejoin="round"
+  />
+  <!-- Second (shadow) outline shifted right -->
+  <path
+    d="M194 22
+       C117 22 62 83 62 158
+       C62 222 102 274 194 412"
+    stroke="#B8845F" stroke-width="16" fill="none" stroke-linecap="round"
+    opacity="0.45"
+  />
+  <!-- Outer circle -->
+  <circle cx="174" cy="154" r="72" stroke="#B8845F" stroke-width="22" fill="none"/>
+  <!-- Inner circle -->
+  <circle cx="174" cy="154" r="34" stroke="#B8845F" stroke-width="18" fill="none"/>
+  <!-- Center dot -->
+  <circle cx="174" cy="154" r="10" stroke="#B8845F" stroke-width="14" fill="none"/>
+  <!-- W-shaped bottom split -->
+  <path
+    d="M140 360 L174 418 L208 360"
+    stroke="#B8845F" stroke-width="24" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  />
+</svg>
