@@ -1,3 +1,91 @@
+@layer base {
+:root {
+--font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+--font-display: "Source Serif 4", ui-serif, Georgia, serif;
+--font-mono: "Geist Mono", ui-monospace, monospace;
+
+    --background: 40 20% 97%;
+    --foreground: 220 20% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 12%;
+
+    --primary: 22 56% 59%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 144 14% 55%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 40 12% 93%;
+    --muted-foreground: 220 10% 46%;
+
+    --accent: 22 56% 93%;
+    --accent-foreground: 22 56% 35%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 40 10% 88%;
+    --input: 40 10% 90%;
+    --ring: 22 56% 59%;
+
+    --radius: 0.625rem;
+
+    --sidebar-background: 40 20% 97%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 22 56% 59%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 40 12% 93%;
+    --sidebar-accent-foreground: 220 14% 20%;
+    --sidebar-border: 40 10% 88%;
+    --sidebar-ring: 22 56% 59%;
+
+}
+
+.dark {
+--background: 222 47% 7%;
+--foreground: 40 20% 92%;
+
+    --card: 222 37% 10%;
+    --card-foreground: 40 20% 92%;
+
+    --popover: 222 37% 10%;
+    --popover-foreground: 40 20% 92%;
+
+    --primary: 22 60% 67%;
+    --primary-foreground: 222 47% 7%;
+
+    --secondary: 144 18% 58%;
+    --secondary-foreground: 222 47% 7%;
+
+    --muted: 222 25% 13%;
+    --muted-foreground: 220 12% 55%;
+
+    --accent: 222 25% 13%;
+    --accent-foreground: 22 60% 67%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 222 18% 16%;
+    --input: 222 25% 13%;
+    --ring: 22 60% 67%;
+
+    --sidebar-background: 222 47% 7%;
+    --sidebar-foreground: 40 20% 92%;
+    --sidebar-primary: 22 60% 67%;
+    --sidebar-primary-foreground: 222 47% 7%;
+    --sidebar-accent: 222 25% 13%;
+    --sidebar-accent-foreground: 40 20% 92%;
+    --sidebar-border: 222 18% 16%;
+    --sidebar-ring: 22 60% 67%;
+
+}
+}
+
 # Sources and steps:
 
 - hero part which could be either:
