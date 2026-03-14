@@ -73,7 +73,7 @@ export default function SearchBar({
   return (
     <div className="relative w-full max-w-[560px]">
       <div className="relative group">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#d4915c]/20 to-[#eab07a]/20 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         <div
           className="relative flex items-center rounded-xl transition-all duration-200"
           style={{

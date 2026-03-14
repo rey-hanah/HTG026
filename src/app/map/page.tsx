@@ -2,19 +2,15 @@
 
 import { useState } from "react";
 import dynamic from "next/dynamic";
-import SearchBar from "@/components/SearchBar";
 import ResultsPanel from "@/components/ResultsPanel";
-import RadiusControl from "@/components/RadiusControl";
-import ArrivalTimeControl from "@/components/ArrivalTimeControl";
 import ThemeToggle from "@/components/ThemeToggle";
 import { geocodeAddress } from "@/lib/nominatim";
 import { fetchParkingFromOSM } from "@/lib/overpass";
 import { fetchParkingMeters } from "@/lib/vancouver";
 import { fetchEVChargers } from "@/lib/ev";
-import { getWalkTime } from "@/lib/osrm";
+import { getWalkTimesBatch } from "@/lib/osrm";
 import { rankParking } from "@/lib/gemini";
 import { ParkingSpot } from "@/types/parking";
-import { MapPin } from "lucide-react";
 
 const DEFAULT_CENTER: [number, number] = [49.2827, -123.1207];
 const DEFAULT_ZOOM = 13;
@@ -147,26 +143,24 @@ export default function Home() {
       }));
 
       spotsWithDistance.sort((a, b) => a.straightDistance - b.straightDistance);
-      const topSpots = spotsWithDistance.slice(0, 15);
+      const topSpots = spotsWithDistance.slice(0, 8);
 
-      // Batch walk time requests with small delays to avoid rate limiting
+      // Batch fetch walk times in parallel
       console.log("Calculating walk times...");
-      for (let i = 0; i < topSpots.length; i++) {
-        const spot = topSpots[i];
-        try {
-          const walk = await getWalkTime(lat, lng, spot.lat, spot.lng);
-          if (walk) {
-            spot.walkTime = `${Math.round(walk.duration / 60)} min`;
-            spot.walkDistance = walk.distance;
-          }
-        } catch {
-          console.warn("Walk time failed for spot:", spot.id);
-        }
+      const walkResults = await getWalkTimesBatch(
+        lat,
+        lng,
+        topSpots.map((s) => ({ lat: s.lat, lng: s.lng, id: s.id }))
+      );
 
-        if (i < topSpots.length - 1) {
-          await new Promise((r) => setTimeout(r, 100));
+      topSpots.forEach((spot) => {
+        const walk = walkResults.get(spot.id);
+        if (walk) {
+          spot.walkTime = `${Math.round(walk.duration / 60)} min`;
+          spot.walkDistance = walk.distance;
+          spot.walkGeometry = walk.geometry;
         }
-      }
+      });
 
       // Sort by walk time
       topSpots.sort(
@@ -190,7 +184,6 @@ export default function Home() {
           const rec = await rankParking(
             query,
             topSpots,
-            arrivalMinutes,
             driveTimeMinutes,
             parkingDensity
           );
@@ -243,110 +236,33 @@ export default function Home() {
 
   return (
     <div
-      className="h-screen flex flex-col"
+      className="h-screen flex flex-col md:flex-row"
       style={{ background: "var(--background)" }}
     >
-      {/* Top header bar */}
-      <header className="absolute top-0 left-0 right-0 z-[1000] p-4">
-        <div className="flex justify-center items-center gap-3 flex-wrap">
-          {/* Logo - links back to landing */}
-          <a
-            href="/"
-            className="hidden md:flex items-center gap-1.5 mr-2"
-            style={{ color: "var(--primary)" }}
-          >
-            <MapPin className="w-5 h-5" />
-            <span
-              className="text-sm font-bold"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
-              SpotAI
-            </span>
-          </a>
+      {/* Sidebar with all controls + results */}
+      <ResultsPanel
+        spots={spots}
+        loading={loading}
+        recommendedId={recommendedId}
+        onNavigate={handleNavigate}
+        onSpotClick={handleSpotClick}
+        filter={filter}
+        onFilterChange={setFilter}
+      />
 
-          <SearchBar
-            onSearch={handleSearch}
-            onLocationSelect={handleUserLocationSelect}
-            loading={loading}
-          />
-
-          {hasSearched && driveTimeMinutes && (
-            <div
-              className="px-3 py-2 rounded-lg text-sm"
-              style={{
-                background: "var(--control-bg)",
-                border: "1px solid var(--control-border)",
-                backdropFilter: "blur(12px)",
-              }}
-            >
-              <span style={{ color: "var(--text-tertiary)" }}>Drive:</span>{" "}
-              <span
-                className="font-medium"
-                style={{ color: "var(--primary)" }}
-              >
-                {driveTimeMinutes} min
-              </span>
-            </div>
-          )}
-
-          {hasSearched && (
-            <>
-              <RadiusControl
-                radius={radius}
-                onRadiusChange={handleRadiusChange}
-              />
-              <ArrivalTimeControl
-                arrivalMinutes={arrivalMinutes}
-                onArrivalChange={handleArrivalChange}
-              />
-            </>
-          )}
-
-          {/* Theme toggle */}
-          <ThemeToggle />
-        </div>
-
-        {error && (
-          <div className="flex justify-center mt-2">
-            <div
-              className="px-4 py-2 rounded-lg text-sm max-w-[560px]"
-              style={{
-                background: "var(--error-bg)",
-                border: "1px solid var(--error-border)",
-                color: "var(--error-text)",
-              }}
-            >
-              {error}
-            </div>
-          </div>
-        )}
-      </header>
-
-      {/* Main: sidebar + map */}
-      <main className="flex-1 flex flex-col md:flex-row pt-20">
-        <ResultsPanel
+      {/* Map */}
+      <div className="flex-1 h-[50vh] md:h-full">
+        <Map
+          center={center}
+          zoom={zoom}
           spots={spots}
-          loading={loading}
           recommendedId={recommendedId}
-          onNavigate={handleNavigate}
-          onSpotClick={handleSpotClick}
+          selectedSpotId={selectedSpotId}
+          onMarkerClick={handleSpotClick}
+          destinationCoords={destinationCoords}
           filter={filter}
-          onFilterChange={setFilter}
         />
-
-        <div className="flex-1 h-[50vh] md:h-full">
-          <Map
-            center={center}
-            zoom={zoom}
-            spots={spots}
-            recommendedId={recommendedId}
-            selectedSpotId={selectedSpotId}
-            onMarkerClick={handleSpotClick}
-            destinationCoords={destinationCoords}
-            filter={filter}
-          />
-        </div>
-      </main>
+      </div>
     </div>
   );
 }

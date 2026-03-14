@@ -134,6 +134,7 @@ export default function Map({
     new globalThis.Map()
   );
   const heatmapLayerRef = useRef<L.Layer | null>(null);
+  const routeLayerRef = useRef<L.Layer | null>(null);
   const tileLayerRef = useRef<L.TileLayer | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [showHeatmap, setShowHeatmap] = useState(false);
@@ -351,6 +352,80 @@ export default function Map({
       heatmapLayerRef.current = heatmapLayer;
     }
   }, [showHeatmap, spots, mapReady]);
+
+  // Draw walking route when a spot is selected
+  useEffect(() => {
+    if (!mapRef.current || !mapReady || !destinationCoords) return;
+
+    const map = mapRef.current;
+
+    // Remove existing route layer
+    if (routeLayerRef.current) {
+      map.removeLayer(routeLayerRef.current);
+      routeLayerRef.current = null;
+    }
+
+    // Find selected spot
+    const selectedSpot = spots.find(s => s.id === selectedSpotId);
+    if (selectedSpot && selectedSpot.walkGeometry) {
+      const routeLayer = L.layerGroup();
+
+      // Draw the route as a dashed line
+      if (selectedSpot.walkGeometry.coordinates) {
+        const coords = selectedSpot.walkGeometry.coordinates.map(
+          (c: number[]) => [c[1], c[0]] as [number, number]
+        );
+
+        // Main route line
+        const polyline = L.polyline(coords, {
+          color: "#8b5cf6",
+          weight: 4,
+          opacity: 0.8,
+          dashArray: "8, 8",
+        });
+        routeLayer.addLayer(polyline);
+
+        // Add dots along the route
+        coords.forEach((c: [number, number], i: number) => {
+          if (i % 3 === 0 || i === coords.length - 1) {
+            const dot = L.circleMarker(c, {
+              radius: 4,
+              fillColor: "#8b5cf6",
+              fillOpacity: 1,
+              color: "white",
+              weight: 2,
+            });
+            routeLayer.addLayer(dot);
+          }
+        });
+
+        // Add start marker (destination)
+        const startMarker = L.marker([destinationCoords[0], destinationCoords[1]], {
+          icon: L.divIcon({
+            className: "",
+            html: `<div style="width:12px;height:12px;background:#8b5cf6;border:2px solid white;border-radius:50%;"></div>`,
+            iconSize: [12, 12],
+            iconAnchor: [6, 6],
+          }),
+        });
+        routeLayer.addLayer(startMarker);
+
+        // Add end marker (parking spot)
+        const endMarker = L.marker([selectedSpot.lat, selectedSpot.lng], {
+          icon: L.divIcon({
+            className: "",
+            html: `<div style="width:12px;height:12px;background:#22c55e;border:2px solid white;border-radius:50%;"></div>`,
+            iconSize: [12, 12],
+            iconAnchor: [6, 6],
+          }),
+        });
+        routeLayer.addLayer(endMarker);
+
+        routeLayer.addTo(map);
+        routeLayerRef.current = routeLayer;
+      }
+    }
+  }, [selectedSpotId, spots, destinationCoords, mapReady]);
 
   return (
     <div className="relative w-full h-full">

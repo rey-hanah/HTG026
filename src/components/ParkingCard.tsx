@@ -54,14 +54,18 @@ const TYPE_CONFIG: Record<
   },
 };
 
-// Stock parking images by type
-const TYPE_IMAGES: Record<string, string> = {
-  free: "https://images.unsplash.com/photo-1506521781263-d8422e82f27a?w=400&h=200&fit=crop&q=60",
-  paid: "https://images.unsplash.com/photo-1573348722427-f1d6819fdf98?w=400&h=200&fit=crop&q=60",
-  ev: "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=400&h=200&fit=crop&q=60",
-  unknown:
-    "https://images.unsplash.com/photo-1590674899484-d5640e854abe?w=400&h=200&fit=crop&q=60",
-};
+// Generate a static map tile image URL from the spot's real coordinates
+// Uses OpenStreetMap tile server: tile URLs follow the pattern /zoom/x/y.png
+function getStaticMapUrl(lat: number, lng: number, zoom = 16): string {
+  // Convert lat/lng to tile coordinates
+  const n = Math.pow(2, zoom);
+  const x = Math.floor(((lng + 180) / 360) * n);
+  const latRad = (lat * Math.PI) / 180;
+  const y = Math.floor(
+    ((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2) * n
+  );
+  return `https://tile.openstreetmap.org/${zoom}/${x}/${y}.png`;
+}
 
 function formatDistance(meters?: number): string {
   if (!meters) return "";
@@ -163,7 +167,7 @@ export default function ParkingCard({
         {/* Card Image */}
         <div className="relative h-28 w-full overflow-hidden">
           <img
-            src={TYPE_IMAGES[spot.type] || TYPE_IMAGES.unknown}
+            src={getStaticMapUrl(spot.lat, spot.lng)}
             alt={spot.name}
             className="h-full w-full object-cover"
           />
@@ -183,7 +187,7 @@ export default function ParkingCard({
           {/* AI recommended badge */}
           {isRecommended && (
             <div className="absolute top-2 right-2">
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-600/90 text-white backdrop-blur-sm">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold backdrop-blur-sm" style={{ background: "rgba(212, 145, 92, 0.9)", color: "#ffffff" }}>
                 <Sparkles className="w-3 h-3" />
                 AI PICK
               </span>
