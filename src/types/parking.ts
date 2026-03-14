@@ -7,6 +7,7 @@ export interface ParkingSpot {
   lng: number;
   walkTime?: string;
   walkDistance?: number;
+  walkGeometry?: any; // GeoJSON geometry for walking route
   rate?: string;
   timeLimit?: string;
   chargers?: number;

@@ -12,8 +12,8 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // OSRM uses lng,lat order
-    const url = `https://router.project-osrm.org/route/v1/foot/${fromLng},${fromLat};${toLng},${toLat}?overview=false`;
+    // OSRM uses lng,lat order - get geometry for route visualization
+    const url = `https://router.project-osrm.org/route/v1/foot/${fromLng},${fromLat};${toLng},${toLat}?overview=full&geometries=geojson`;
     
     const res = await fetch(url, {
       headers: {
@@ -23,21 +23,23 @@ export async function GET(request: NextRequest) {
 
     if (!res.ok) {
       console.error("OSRM error:", res.status);
-      return NextResponse.json({ duration: null, distance: null });
+      return NextResponse.json({ duration: null, distance: null, geometry: null });
     }
 
     const data = await res.json();
     
     if (!data.routes || data.routes.length === 0) {
-      return NextResponse.json({ duration: null, distance: null });
+      return NextResponse.json({ duration: null, distance: null, geometry: null });
     }
 
+    const route = data.routes[0];
     return NextResponse.json({
-      duration: data.routes[0].duration,
-      distance: data.routes[0].distance,
+      duration: route.duration,
+      distance: route.distance,
+      geometry: route.geometry,
     });
   } catch (e) {
     console.error("OSRM error:", e);
-    return NextResponse.json({ duration: null, distance: null });
+    return NextResponse.json({ duration: null, distance: null, geometry: null });
   }
 }
