@@ -4,20 +4,20 @@ export async function getWalkTime(
   toLat: number, 
   toLng: number
 ): Promise<{ duration: number; distance: number } | null> {
-  const url = `https://router.project-osrm.org/route/v1/foot/${fromLng},${fromLat};${toLng},${toLat}?overview=false`;
-  
   try {
-    const res = await fetch(url);
+    const res = await fetch(
+      `/api/walk?fromLat=${fromLat}&fromLng=${fromLng}&toLat=${toLat}&toLng=${toLng}`
+    );
     const data = await res.json();
     
-    if (!data.routes || data.routes.length === 0) return null;
+    if (!data.duration) return null;
     
     return {
-      duration: data.routes[0].duration,
-      distance: data.routes[0].distance,
+      duration: data.duration,
+      distance: data.distance,
     };
   } catch (e) {
-    console.error("OSRM error:", e);
+    console.error("Walk time error:", e);
     return null;
   }
 }

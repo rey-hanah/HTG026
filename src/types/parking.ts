@@ -1,6 +1,7 @@
 export interface ParkingSpot {
   id: string;
   name: string;
+  address?: string;
   type: "free" | "paid" | "ev" | "unknown";
   lat: number;
   lng: number;
@@ -9,6 +10,8 @@ export interface ParkingSpot {
   rate?: string;
   timeLimit?: string;
   chargers?: number;
+  operator?: string;
+  isOperational?: boolean;
   source: "overpass" | "vancouver" | "ev" | "fallback";
   aiRecommended?: boolean;
   aiReason?: string;

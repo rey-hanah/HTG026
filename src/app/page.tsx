@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import dynamic from "next/dynamic";
 import SearchBar from "@/components/SearchBar";
 import ResultsPanel from "@/components/ResultsPanel";
+import RadiusControl from "@/components/RadiusControl";
+import ArrivalTimeControl from "@/components/ArrivalTimeControl";
 import { geocodeAddress } from "@/lib/nominatim";
 import { fetchParkingFromOSM } from "@/lib/overpass";
 import { fetchParkingMeters } from "@/lib/vancouver";
@@ -24,18 +26,26 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState<"all" | "free" | "paid" | "ev">("all");
   const [recommendedId, setRecommendedId] = useState<string>();
+  const [selectedSpotId, setSelectedSpotId] = useState<string>();
   const [destination, setDestination] = useState("");
   const [destinationCoords, setDestinationCoords] = useState<[number, number] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [radius, setRadius] = useState(500); // meters
+  const [hasSearched, setHasSearched] = useState(false);
+  const [arrivalMinutes, setArrivalMinutes] = useState<number | null>(null);
 
-  const handleSearch = async (query: string) => {
+  const handleSearch = async (query: string, searchRadius?: number) => {
+    const currentRadius = searchRadius ?? radius;
     setLoading(true);
     setDestination(query);
     setRecommendedId(undefined);
+    setSelectedSpotId(undefined);
     setError(null);
+    setSpots([]);
+    setHasSearched(true);
     
     try {
-      console.log("Searching for:", query);
+      console.log("Searching for:", query, "with radius:", currentRadius);
       
       const location = await geocodeAddress(query);
       console.log("Location result:", location);
@@ -49,16 +59,16 @@ export default function Home() {
       const [lat, lng] = [location.lat, location.lng];
       console.log("Coordinates:", lat, lng);
       
-      setCenter([lat, lng]);
-      setZoom(15);
       setDestinationCoords([lat, lng]);
+      setCenter([lat, lng]);
+      setZoom(16);
 
-      // Fetch all parking data in parallel
+      // Fetch all parking data in parallel with radius
       console.log("Fetching parking data...");
       const [osmSpots, meters, evChargers] = await Promise.all([
-        fetchParkingFromOSM(lat, lng),
-        fetchParkingMeters(lat, lng),
-        fetchEVChargers(lat, lng),
+        fetchParkingFromOSM(lat, lng, currentRadius),
+        fetchParkingMeters(lat, lng, currentRadius),
+        fetchEVChargers(lat, lng, currentRadius),
       ]);
 
       console.log("Results - OSM:", osmSpots.length, "Meters:", meters.length, "EV:", evChargers.length);
@@ -71,7 +81,7 @@ export default function Home() {
         return;
       }
 
-      // OPTIMIZATION: Parallel walk time calculation + limit to top 20 by distance
+      // Calculate straight-line distance and sort
       const spotsWithDistance = allSpots.map(spot => ({
         ...spot,
         straightDistance: Math.sqrt(
@@ -80,34 +90,48 @@ export default function Home() {
       }));
       
       spotsWithDistance.sort((a, b) => a.straightDistance - b.straightDistance);
-      const topSpots = spotsWithDistance.slice(0, 20);
+      const topSpots = spotsWithDistance.slice(0, 15);
 
-      console.log("Calculating walk times for", topSpots.length, "spots...");
+      // Batch walk time requests with small delays to avoid rate limiting
+      console.log("Calculating walk times...");
+      for (let i = 0; i < topSpots.length; i++) {
+        const spot = topSpots[i];
+        try {
+          const walk = await getWalkTime(lat, lng, spot.lat, spot.lng);
+          if (walk) {
+            spot.walkTime = `${Math.round(walk.duration / 60)} min`;
+            spot.walkDistance = walk.distance;
+          }
+        } catch (e) {
+          console.warn("Walk time failed for spot:", spot.id);
+        }
+        
+        // Small delay between requests
+        if (i < topSpots.length - 1) {
+          await new Promise(r => setTimeout(r, 100));
+        }
+      }
 
-      const walkTimePromises = topSpots.map(spot => 
-        getWalkTime(lat, lng, spot.lat, spot.lng)
-          .then(walk => {
-            if (walk) {
-              spot.walkTime = `${Math.round(walk.duration / 60)} min`;
-              spot.walkDistance = walk.distance;
-            }
-            return spot;
-          })
-      );
-
-      await Promise.all(walkTimePromises);
+      // Sort by walk time
+      topSpots.sort((a, b) => (a.walkDistance || 999999) - (b.walkDistance || 999999));
+      
       setSpots(topSpots);
 
       // Get AI recommendation
       console.log("Getting AI recommendation...");
       if (topSpots.length > 0) {
-        const rec = await rankParking(query, topSpots);
-        if (rec && rec.best_index < topSpots.length) {
-          const bestSpot = topSpots[rec.best_index];
-          bestSpot.aiRecommended = true;
-          bestSpot.aiReason = rec.reason;
-          bestSpot.availabilityEstimate = rec.availability_estimate;
-          setRecommendedId(bestSpot.id);
+        try {
+          const rec = await rankParking(query, topSpots, arrivalMinutes);
+          if (rec && rec.best_index < topSpots.length) {
+            const bestSpot = topSpots[rec.best_index];
+            bestSpot.aiRecommended = true;
+            bestSpot.aiReason = rec.reason;
+            bestSpot.availabilityEstimate = rec.availability_estimate;
+            setRecommendedId(bestSpot.id);
+            setSpots([...topSpots]); // Trigger re-render
+          }
+        } catch (e) {
+          console.warn("AI recommendation failed:", e);
         }
       }
       
@@ -126,15 +150,39 @@ export default function Home() {
   };
 
   const handleSpotClick = (spot: ParkingSpot) => {
+    setSelectedSpotId(spot.id);
     setCenter([spot.lat, spot.lng]);
-    setZoom(17);
+    setZoom(18);
+  };
+
+  const handleRadiusChange = (newRadius: number) => {
+    setRadius(newRadius);
+    // Re-search with new radius if we have a destination
+    if (destination) {
+      handleSearch(destination, newRadius);
+    }
+  };
+
+  const handleArrivalChange = (minutes: number | null) => {
+    setArrivalMinutes(minutes);
+    // Re-run AI recommendation if we have spots
+    if (destination && spots.length > 0) {
+      // Re-search to get updated AI recommendation
+      handleSearch(destination, radius);
+    }
   };
 
   return (
     <div className="h-screen flex flex-col">
       <header className="absolute top-0 left-0 right-0 z-[1000] p-4">
-        <div className="flex justify-center">
+        <div className="flex justify-center items-center gap-3 flex-wrap">
           <SearchBar onSearch={handleSearch} loading={loading} />
+          {hasSearched && (
+            <>
+              <RadiusControl radius={radius} onRadiusChange={handleRadiusChange} />
+              <ArrivalTimeControl arrivalMinutes={arrivalMinutes} onArrivalChange={handleArrivalChange} />
+            </>
+          )}
         </div>
         {error && (
           <div className="flex justify-center mt-2">
@@ -162,6 +210,7 @@ export default function Home() {
             zoom={zoom}
             spots={spots}
             recommendedId={recommendedId}
+            selectedSpotId={selectedSpotId}
             onMarkerClick={handleSpotClick}
             destinationCoords={destinationCoords}
             filter={filter}
