@@ -248,6 +248,17 @@ export default function Home() {
         onSpotClick={handleSpotClick}
         filter={filter}
         onFilterChange={setFilter}
+        onSearch={handleSearch}
+        onLocationSelect={handleUserLocationSelect}
+        searchLoading={loading}
+        hasSearched={hasSearched}
+        radius={radius}
+        onRadiusChange={handleRadiusChange}
+        arrivalMinutes={arrivalMinutes}
+        onArrivalChange={handleArrivalChange}
+        driveTimeMinutes={driveTimeMinutes}
+        error={error}
+        headerActions={<ThemeToggle />}
       />
 
       {/* Map */}

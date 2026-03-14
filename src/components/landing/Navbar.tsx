@@ -30,10 +30,10 @@ export default function Navbar() {
       className="fixed top-0 left-0 right-0 z-50"
     >
       <nav
-        className={`mx-auto mt-4 max-w-6xl px-6 transition-all duration-500 lg:px-10 ${
+        className={`mx-auto mt-4 transition-all duration-500 ${
           scrolled
-            ? "mt-3 max-w-4xl rounded-2xl border border-[var(--color-ink-resolved)]/[0.06] bg-[var(--color-canvas-resolved)]/80 backdrop-blur-2xl"
-            : ""
+            ? "mt-3 max-w-4xl rounded-[20px] border border-[var(--color-ink-resolved)]/[0.06] bg-[var(--color-canvas-resolved)]/80 px-6 backdrop-blur-2xl"
+            : "container-landing"
         }`}
       >
         <div className="flex items-center justify-between py-4">

@@ -66,30 +66,30 @@ function CardDecorator({
 
 export default function FeaturesSection() {
   return (
-    <section id="features" className="py-16 md:py-32">
-      <div className="mx-auto max-w-5xl px-6">
+    <section id="features" className="section-padding">
+      <div className="container-landing">
         {/* Section header */}
-        <div className="mx-auto max-w-2xl text-center">
+        <div className="mx-auto max-w-2xl text-center mb-12 lg:mb-16">
           <span className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
             Why SpotAI
           </span>
-          <h2 className="mt-4 text-balance font-display text-3xl font-semibold tracking-tight md:text-4xl lg:text-5xl">
+          <h2 className="mt-4 text-balance font-display text-3xl font-bold tracking-tight text-[var(--color-ink-resolved)] md:text-4xl lg:text-5xl">
             Built for smarter{" "}
             <span className="bg-gradient-to-r from-accent to-accent-light bg-clip-text text-transparent">
               parking.
             </span>
           </h2>
-          <p className="mt-4 text-[var(--color-ink-muted-resolved)]">
+          <p className="mt-4 text-[var(--color-ink-muted-resolved)] text-lg">
             Three core pillars that make SpotAI different from any maps app.
           </p>
         </div>
 
         {/* Cards grid */}
-        <div className="mx-auto mt-16 grid gap-8 md:grid-cols-3">
+        <div className="mx-auto grid gap-6 md:grid-cols-3 lg:gap-8">
           {features.map((feature) => (
             <Card
               key={feature.title}
-              className="group relative overflow-hidden border border-[var(--color-ink-resolved)]/[0.06] bg-[var(--color-ink-resolved)]/[0.02] shadow-none"
+              className="glass-card group relative overflow-hidden rounded-[20px] shadow-none"
             >
               <CardHeader className="pb-3">
                 <CardDecorator>

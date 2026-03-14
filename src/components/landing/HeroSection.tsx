@@ -38,7 +38,7 @@ const stats = [
 
 export default function HeroSection() {
   return (
-    <section className="relative min-h-screen overflow-hidden">
+    <section className="relative overflow-hidden" style={{ minHeight: "calc(100vh - 72px)" }}>
       {/* ── Atmosphere ── */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(212,145,92,0.06),transparent)]" />
@@ -55,11 +55,11 @@ export default function HeroSection() {
       </div>
 
       {/* ── Content ── */}
-      <div className="relative z-10 mx-auto max-w-7xl px-6 pb-24 pt-36 lg:pt-44">
-        <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
+      <div className="container-landing relative z-10 flex min-h-[inherit] flex-col justify-center pb-24 pt-32 lg:pt-24">
+        <div className="grid items-center gap-12 lg:grid-cols-[55%_45%] lg:gap-16">
 
-          {/* ── Left: Copy ── */}
-          <div className="space-y-8 lg:col-span-7">
+          {/* ── Left: Copy (55%) ── */}
+          <div className="space-y-8">
             <motion.div variants={fade(0)} initial="hidden" animate="visible">
               <span className="inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent/[0.06] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-accent">
                 <Sparkles className="h-3 w-3" />
@@ -71,7 +71,11 @@ export default function HeroSection() {
               variants={fade(1)}
               initial="hidden"
               animate="visible"
-              className="font-display text-5xl font-bold leading-[1.05] tracking-tight text-[var(--color-ink-resolved)] sm:text-6xl lg:text-7xl"
+              className="font-display font-extrabold leading-[1.05] text-[var(--color-ink-resolved)]"
+              style={{
+                fontSize: "clamp(48px, 8vw, 72px)",
+                letterSpacing: "-0.03em",
+              }}
             >
               Find Parking
               <br />
@@ -113,12 +117,12 @@ export default function HeroSection() {
             </motion.div>
           </div>
 
-          {/* ── Right: Interactive Map Card ── */}
+          {/* ── Right: Interactive Map Card (45%) ── */}
           <motion.div
             variants={fade(2)}
             initial="hidden"
             animate="visible"
-            className="flex justify-center lg:col-span-5 lg:justify-end"
+            className="flex justify-center lg:justify-end"
           >
             <MapCard />
           </motion.div>
@@ -129,11 +133,11 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 1, ease }}
-          className="mt-28 flex flex-wrap items-center justify-center gap-8 border-t border-[var(--color-ink-resolved)]/[0.06] pt-10 lg:gap-16"
+          className="mt-24 flex flex-wrap items-center justify-center gap-8 border-t border-[var(--color-ink-resolved)]/[0.06] pt-10 lg:gap-16"
         >
           {stats.map((s) => (
-            <div key={s.label} className="flex items-center gap-3">
-              <s.icon className="h-4 w-4 text-[var(--color-ink-muted-resolved)]/60" />
+            <div key={s.label} className="glass-card flex items-center gap-3 rounded-lg px-4 py-3">
+              <s.icon className="h-4 w-4 text-accent" />
               <div>
                 <span className="text-xl font-bold text-[var(--color-ink-resolved)]">{s.value}</span>
                 <span className="ml-2 text-sm text-[var(--color-ink-muted-resolved)]">{s.label}</span>
@@ -202,10 +206,10 @@ function MapCard() {
             rotateY,
             transformStyle: "preserve-3d",
           }}
-          className="relative overflow-hidden rounded-2xl border border-[var(--color-ink-resolved)]/[0.08] bg-[var(--color-ink-resolved)]/[0.03] backdrop-blur-xl"
+          className="glass-card relative overflow-hidden rounded-[20px]"
           animate={{
-            width: expanded ? 380 : 280,
-            height: expanded ? "auto" : 200,
+            width: expanded ? 380 : 300,
+            height: expanded ? "auto" : 220,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 35 }}
         >

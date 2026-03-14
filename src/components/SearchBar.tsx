@@ -104,7 +104,7 @@ export default function SearchBar({
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Where are you going?"
-            className="flex-1 h-14 px-3 py-2 bg-transparent text-base focus:outline-none"
+            className="flex-1 min-w-0 h-14 px-3 py-2 bg-transparent text-base focus:outline-none"
             style={{
               color: "var(--text-primary)",
             }}
@@ -112,7 +112,7 @@ export default function SearchBar({
           {value && (
             <button
               onClick={() => setValue("")}
-              className="p-2 transition-colors"
+              className="p-2 shrink-0 transition-colors"
               style={{ color: "var(--text-tertiary)" }}
             >
               <X className="w-4 h-4" />
@@ -121,7 +121,7 @@ export default function SearchBar({
           <button
             onClick={handleSearch}
             disabled={loading || !value.trim()}
-            className="h-10 px-4 mr-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-40"
+            className="h-10 px-4 mr-2 shrink-0 text-sm font-medium rounded-lg transition-colors disabled:opacity-40"
             style={{
               background: "var(--btn-primary-bg)",
               color: "var(--btn-primary-text)",
