@@ -25,6 +25,7 @@ export default function Home() {
   const [filter, setFilter] = useState<"all" | "free" | "paid" | "ev">("all");
   const [recommendedId, setRecommendedId] = useState<string>();
   const [destination, setDestination] = useState("");
+  const [destinationCoords, setDestinationCoords] = useState<[number, number] | null>(null);
 
   const handleSearch = async (query: string) => {
     setLoading(true);
@@ -42,6 +43,7 @@ export default function Home() {
       const [lat, lng] = [location.lat, location.lng];
       setCenter([lat, lng]);
       setZoom(15);
+      setDestinationCoords([lat, lng]);
 
       const [osmSpots, meters, evChargers] = await Promise.all([
         fetchParkingFromOSM(lat, lng),
@@ -51,20 +53,35 @@ export default function Home() {
 
       let allSpots: ParkingSpot[] = [...osmSpots, ...meters, ...evChargers];
 
-      for (const spot of allSpots) {
-        const walk = await getWalkTime(lat, lng, spot.lat, spot.lng);
-        if (walk) {
-          spot.walkTime = `${Math.round(walk.duration / 60)} min`;
-          spot.walkDistance = walk.distance;
-        }
-      }
+      // OPTIMIZATION: Parallel walk time calculation + limit to top 20 by distance
+      const spotsWithDistance = allSpots.map(spot => ({
+        ...spot,
+        straightDistance: Math.sqrt(
+          Math.pow(spot.lat - lat, 2) + Math.pow(spot.lng - lng, 2)
+        )
+      }));
+      
+      spotsWithDistance.sort((a, b) => a.straightDistance - b.straightDistance);
+      const topSpots = spotsWithDistance.slice(0, 20);
 
-      setSpots(allSpots);
+      const walkTimePromises = topSpots.map(spot => 
+        getWalkTime(lat, lng, spot.lat, spot.lng)
+          .then(walk => {
+            if (walk) {
+              spot.walkTime = `${Math.round(walk.duration / 60)} min`;
+              spot.walkDistance = walk.distance;
+            }
+            return spot;
+          })
+      );
 
-      if (allSpots.length > 0) {
-        const rec = await rankParking(query, allSpots);
-        if (rec && rec.best_index < allSpots.length) {
-          const bestSpot = allSpots[rec.best_index];
+      await Promise.all(walkTimePromises);
+      setSpots(topSpots);
+
+      if (topSpots.length > 0) {
+        const rec = await rankParking(query, topSpots);
+        if (rec && rec.best_index < topSpots.length) {
+          const bestSpot = topSpots[rec.best_index];
           bestSpot.aiRecommended = true;
           bestSpot.aiReason = rec.reason;
           bestSpot.availabilityEstimate = rec.availability_estimate;
@@ -85,7 +102,7 @@ export default function Home() {
 
   const handleSpotClick = (spot: ParkingSpot) => {
     setCenter([spot.lat, spot.lng]);
-    setZoom(16);
+    setZoom(17);
   };
 
   return (
@@ -114,6 +131,8 @@ export default function Home() {
             spots={spots}
             recommendedId={recommendedId}
             onMarkerClick={handleSpotClick}
+            destinationCoords={destinationCoords}
+            filter={filter}
           />
         </div>
       </main>
