@@ -26,32 +26,50 @@ export default function Home() {
   const [recommendedId, setRecommendedId] = useState<string>();
   const [destination, setDestination] = useState("");
   const [destinationCoords, setDestinationCoords] = useState<[number, number] | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSearch = async (query: string) => {
     setLoading(true);
     setDestination(query);
     setRecommendedId(undefined);
+    setError(null);
     
     try {
+      console.log("Searching for:", query);
+      
       const location = await geocodeAddress(query);
+      console.log("Location result:", location);
+      
       if (!location) {
-        console.error("Location not found");
+        setError("Location not found. Try a more specific address.");
         setLoading(false);
         return;
       }
 
       const [lat, lng] = [location.lat, location.lng];
+      console.log("Coordinates:", lat, lng);
+      
       setCenter([lat, lng]);
       setZoom(15);
       setDestinationCoords([lat, lng]);
 
+      // Fetch all parking data in parallel
+      console.log("Fetching parking data...");
       const [osmSpots, meters, evChargers] = await Promise.all([
         fetchParkingFromOSM(lat, lng),
         fetchParkingMeters(lat, lng),
         fetchEVChargers(lat, lng),
       ]);
 
+      console.log("Results - OSM:", osmSpots.length, "Meters:", meters.length, "EV:", evChargers.length);
+
       let allSpots: ParkingSpot[] = [...osmSpots, ...meters, ...evChargers];
+
+      if (allSpots.length === 0) {
+        setError("No parking found nearby. Try a different location.");
+        setLoading(false);
+        return;
+      }
 
       // OPTIMIZATION: Parallel walk time calculation + limit to top 20 by distance
       const spotsWithDistance = allSpots.map(spot => ({
@@ -63,6 +81,8 @@ export default function Home() {
       
       spotsWithDistance.sort((a, b) => a.straightDistance - b.straightDistance);
       const topSpots = spotsWithDistance.slice(0, 20);
+
+      console.log("Calculating walk times for", topSpots.length, "spots...");
 
       const walkTimePromises = topSpots.map(spot => 
         getWalkTime(lat, lng, spot.lat, spot.lng)
@@ -78,6 +98,8 @@ export default function Home() {
       await Promise.all(walkTimePromises);
       setSpots(topSpots);
 
+      // Get AI recommendation
+      console.log("Getting AI recommendation...");
       if (topSpots.length > 0) {
         const rec = await rankParking(query, topSpots);
         if (rec && rec.best_index < topSpots.length) {
@@ -88,8 +110,11 @@ export default function Home() {
           setRecommendedId(bestSpot.id);
         }
       }
+      
+      console.log("Search complete!");
     } catch (e) {
       console.error("Search error:", e);
+      setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -111,6 +136,13 @@ export default function Home() {
         <div className="flex justify-center">
           <SearchBar onSearch={handleSearch} loading={loading} />
         </div>
+        {error && (
+          <div className="flex justify-center mt-2">
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-lg text-sm max-w-[560px]">
+              {error}
+            </div>
+          </div>
+        )}
       </header>
 
       <main className="flex-1 flex flex-col md:flex-row pt-20">
