@@ -1,134 +1,107 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
-import { Clock, Car, DollarSign, Leaf, Brain, MapPin } from "lucide-react";
+import { Brain, Radio, Layers } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
-const ease = [0.22, 1, 0.36, 1] as const;
+type Feature = {
+  icon: React.ElementType;
+  title: string;
+  description: string;
+};
 
-const features = [
-  {
-    icon: Clock,
-    stat: "17 hrs",
-    title: "Time Wasted Yearly",
-    description:
-      "The average US driver spends 17 hours per year searching for parking — up to 107 in cities like NYC.",
-    accent: "accent",
-  },
-  {
-    icon: Car,
-    stat: "30%",
-    title: "Urban Traffic from Cruising",
-    description:
-      "Up to 30% of city traffic is just drivers circling for a spot, clogging streets and wasting fuel.",
-    accent: "accent-light",
-  },
-  {
-    icon: DollarSign,
-    stat: "$345",
-    title: "Annual Cost per Driver",
-    description:
-      "Between fuel, time, and fines, the average driver loses $345 every year to the parking hunt.",
-    accent: "accent",
-  },
-  {
-    icon: Leaf,
-    stat: "730 tons",
-    title: "CO₂ per District",
-    description:
-      "A single LA district produces 730 tons of CO₂ annually from drivers cruising for parking alone.",
-    accent: "success",
-  },
+const features: Feature[] = [
   {
     icon: Brain,
-    stat: "AI-Powered",
-    title: "Smart Recommendations",
+    title: "AI-Powered Rankings",
     description:
-      "Gemini AI analyzes time of day, location type, and walk distance to recommend the best spot for you.",
-    accent: "accent-light",
+      "Gemini AI considers time of day, walk distance, pricing, and availability patterns to recommend the single best parking spot for you.",
   },
   {
-    icon: MapPin,
-    stat: "5 APIs",
-    title: "Comprehensive Coverage",
+    icon: Radio,
+    title: "Real-Time Data",
     description:
-      "We search free street parking, paid lots, and EV chargers simultaneously across multiple data sources.",
-    accent: "accent",
+      "Live queries across free street parking, paid lots, and EV chargers — updated every search so you never get stale results.",
+  },
+  {
+    icon: Layers,
+    title: "Multi-Source Coverage",
+    description:
+      "We search 5 APIs simultaneously — Overpass, Vancouver Open Data, Open Charge Map, OSRM, and more — so no spot goes unnoticed.",
   },
 ];
 
-const accentMap: Record<string, string> = {
-  accent: "text-accent border-accent/20 bg-accent/[0.06]",
-  "accent-light": "text-accent-light border-accent-light/20 bg-accent-light/[0.06]",
-  success: "text-success border-success/20 bg-success/[0.06]",
-};
-
-const statColor: Record<string, string> = {
-  accent: "text-accent",
-  "accent-light": "text-accent-light",
-  success: "text-success",
-};
+function CardDecorator({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="relative mx-auto size-36 duration-200 [--color-border:color-mix(in_oklab,var(--color-accent)25%,transparent)] group-hover:[--color-border:color-mix(in_oklab,var(--color-accent)50%,transparent)]">
+      <div
+        aria-hidden
+        className="absolute inset-0 bg-[linear-gradient(to_right,var(--color-border)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-border)_1px,transparent_1px)] bg-[size:24px_24px]"
+      />
+      <div
+        aria-hidden
+        className="bg-[var(--color-canvas-resolved)] absolute inset-0 m-auto size-12 rounded-xl border border-[var(--color-border)]"
+      />
+      <div className="bg-[var(--color-canvas-resolved)] absolute z-1 inset-0 m-auto flex size-12 items-center justify-center rounded-xl border border-[var(--color-border)]">
+        {children}
+      </div>
+    </div>
+  );
+}
 
 export default function FeaturesSection() {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
-
   return (
-    <section id="features" className="relative py-28 lg:py-36">
-      {/* Subtle top divider */}
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-ink/[0.06] to-transparent" />
-
-      <div ref={ref} className="mx-auto max-w-7xl px-6">
+    <section id="features" className="py-16 md:py-32">
+      <div className="mx-auto max-w-5xl px-6">
         {/* Section header */}
-        <motion.div
-          className="mx-auto max-w-2xl text-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.7, ease }}
-        >
+        <div className="mx-auto max-w-2xl text-center">
           <span className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-            The Problem
+            Why SpotAI
           </span>
-          <h2 className="mt-4 font-display text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-            Parking is{" "}
+          <h2 className="mt-4 text-balance font-display text-3xl font-semibold tracking-tight md:text-4xl lg:text-5xl">
+            Built for smarter{" "}
             <span className="bg-gradient-to-r from-accent to-accent-light bg-clip-text text-transparent">
-              broken.
+              parking.
             </span>
           </h2>
-          <p className="mt-4 text-base leading-relaxed text-ink-muted">
-            Drivers waste billions in time, fuel, and emissions every year
-            circling for spots. SpotAI fixes that with real-time data and AI.
+          <p className="mt-4 text-[var(--color-ink-muted-resolved)]">
+            Three core pillars that make SpotAI different from any maps app.
           </p>
-        </motion.div>
+        </div>
 
-        {/* Feature cards grid */}
-        <div className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((f, i) => (
-            <motion.div
-              key={f.title}
-              initial={{ opacity: 0, y: 24 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.6, ease, delay: 0.1 + i * 0.08 }}
-              className="group relative rounded-2xl border border-ink/[0.06] bg-ink/[0.02] p-6 transition-colors hover:border-ink/[0.1] hover:bg-ink/[0.04]"
+        {/* Cards grid */}
+        <div className="mx-auto mt-16 grid gap-4 md:grid-cols-3">
+          {features.map((feature) => (
+            <Card
+              key={feature.title}
+              className="group relative overflow-hidden border border-[var(--color-ink-resolved)]/[0.06] bg-[var(--color-ink-resolved)]/[0.02] shadow-none"
             >
-              {/* Icon */}
-              <div
-                className={`inline-flex h-10 w-10 items-center justify-center rounded-xl border ${accentMap[f.accent]}`}
-              >
-                <f.icon className="h-4.5 w-4.5" />
-              </div>
-
-              {/* Stat */}
-              <div className={`mt-4 font-display text-2xl font-bold ${statColor[f.accent]}`}>
-                {f.stat}
-              </div>
-
-              {/* Text */}
-              <h3 className="mt-1 text-sm font-semibold text-ink">{f.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-                {f.description}
-              </p>
-            </motion.div>
+              <CardHeader className="pb-3">
+                <CardDecorator>
+                  <feature.icon
+                    className="size-6 text-accent"
+                    aria-hidden
+                  />
+                </CardDecorator>
+                <CardTitle className="mt-6 text-center font-display text-lg font-semibold">
+                  {feature.title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-center text-sm leading-relaxed text-[var(--color-ink-muted-resolved)]">
+                  {feature.description}
+                </CardDescription>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>

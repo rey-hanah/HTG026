@@ -45,10 +45,10 @@ export default function HeroSection() {
         <div className="absolute left-1/4 top-1/4 h-[600px] w-[600px] rounded-full bg-accent/[0.03] blur-[160px]" />
         <div className="absolute right-[10%] top-[20%] h-[400px] w-[400px] rounded-full bg-accent/[0.02] blur-[120px]" />
         <div
-          className="absolute inset-0 opacity-[0.015]"
+          className="absolute inset-0 opacity-[0.015] dark:opacity-[0.015]"
           style={{
             backgroundImage:
-              "linear-gradient(rgba(240,236,228,.4) 1px,transparent 1px),linear-gradient(90deg,rgba(240,236,228,.4) 1px,transparent 1px)",
+              "linear-gradient(var(--color-ink-muted-resolved,.4) 1px,transparent 1px),linear-gradient(90deg,var(--color-ink-muted-resolved,.4) 1px,transparent 1px)",
             backgroundSize: "72px 72px",
           }}
         />
@@ -71,7 +71,7 @@ export default function HeroSection() {
               variants={fade(1)}
               initial="hidden"
               animate="visible"
-              className="font-display text-5xl font-bold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl"
+              className="font-display text-5xl font-bold leading-[1.05] tracking-tight text-[var(--color-ink-resolved)] sm:text-6xl lg:text-7xl"
             >
               Find Parking
               <br />
@@ -85,7 +85,7 @@ export default function HeroSection() {
               variants={fade(2)}
               initial="hidden"
               animate="visible"
-              className="max-w-lg text-lg leading-relaxed text-ink-muted"
+              className="max-w-lg text-lg leading-relaxed text-[var(--color-ink-muted-resolved)]"
             >
               SpotAI searches every free street spot, paid lot, and EV charger
               near your destination&nbsp;— then uses AI to recommend the best one.
@@ -99,14 +99,14 @@ export default function HeroSection() {
             >
               <Link
                 href="/map"
-                className="group inline-flex items-center justify-center gap-2 rounded-full bg-accent px-8 py-4 text-sm font-semibold text-canvas transition-all hover:bg-accent-light hover:scale-[1.02] active:scale-[0.98]"
+                className="group inline-flex items-center justify-center gap-2 rounded-full bg-accent px-8 py-4 text-sm font-semibold text-white transition-all hover:bg-accent-light hover:scale-[1.02] active:scale-[0.98]"
               >
                 Find Parking Now
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
               <a
                 href="#how-it-works"
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-ink/10 bg-ink/[0.03] px-8 py-4 text-sm font-semibold text-ink backdrop-blur-sm transition-colors hover:bg-ink/[0.06] hover:border-ink/[0.15]"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-[var(--color-ink-resolved)]/10 bg-[var(--color-ink-resolved)]/[0.03] px-8 py-4 text-sm font-semibold text-[var(--color-ink-resolved)] backdrop-blur-sm transition-colors hover:bg-[var(--color-ink-resolved)]/[0.06] hover:border-[var(--color-ink-resolved)]/[0.15]"
               >
                 See How it Works
               </a>
@@ -129,14 +129,14 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 1, ease }}
-          className="mt-28 flex flex-wrap items-center justify-center gap-8 border-t border-ink/[0.06] pt-10 lg:gap-16"
+          className="mt-28 flex flex-wrap items-center justify-center gap-8 border-t border-[var(--color-ink-resolved)]/[0.06] pt-10 lg:gap-16"
         >
           {stats.map((s) => (
             <div key={s.label} className="flex items-center gap-3">
-              <s.icon className="h-4 w-4 text-ink-muted/60" />
+              <s.icon className="h-4 w-4 text-[var(--color-ink-muted-resolved)]/60" />
               <div>
-                <span className="text-xl font-bold text-ink">{s.value}</span>
-                <span className="ml-2 text-sm text-ink-muted">{s.label}</span>
+                <span className="text-xl font-bold text-[var(--color-ink-resolved)]">{s.value}</span>
+                <span className="ml-2 text-sm text-[var(--color-ink-muted-resolved)]">{s.label}</span>
               </div>
             </div>
           ))}
@@ -202,7 +202,7 @@ function MapCard() {
             rotateY,
             transformStyle: "preserve-3d",
           }}
-          className="relative overflow-hidden rounded-2xl border border-ink/[0.08] bg-ink/[0.03] backdrop-blur-xl"
+          className="relative overflow-hidden rounded-2xl border border-[var(--color-ink-resolved)]/[0.08] bg-[var(--color-ink-resolved)]/[0.03] backdrop-blur-xl"
           animate={{
             width: expanded ? 380 : 280,
             height: expanded ? "auto" : 200,
@@ -217,20 +217,17 @@ function MapCard() {
           />
 
           {/* Subtle gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-br from-panel/20 via-transparent to-panel/40" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-panel-resolved)]/20 via-transparent to-[var(--color-panel-resolved)]/40" />
 
           {/* ── Map visual area ── */}
           <div className="relative">
-            {/* Collapsed: minimal grid + pin */}
             <motion.div
               className="relative overflow-hidden"
-              animate={{
-                height: expanded ? 180 : 120,
-              }}
+              animate={{ height: expanded ? 180 : 120 }}
               transition={{ type: "spring", stiffness: 400, damping: 35 }}
             >
               {/* Background */}
-              <div className="absolute inset-0 bg-panel" />
+              <div className="absolute inset-0 bg-[var(--color-panel-resolved)]" />
 
               {/* Grid pattern (collapsed) */}
               <AnimatePresence>
@@ -244,7 +241,7 @@ function MapCard() {
                     <svg width="100%" height="100%">
                       <defs>
                         <pattern id="hero-grid" width="24" height="24" patternUnits="userSpaceOnUse">
-                          <path d="M 24 0 L 0 0 0 24" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-ink" />
+                          <path d="M 24 0 L 0 0 0 24" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-[var(--color-ink-resolved)]" />
                         </pattern>
                       </defs>
                       <rect width="100%" height="100%" fill="url(#hero-grid)" />
@@ -263,41 +260,38 @@ function MapCard() {
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.4, delay: 0.1 }}
                   >
-                    <div className="absolute inset-0 bg-panel-light" />
+                    <div className="absolute inset-0 bg-[var(--color-panel-light-resolved)]" />
                     <svg className="absolute inset-0 h-full w-full" preserveAspectRatio="none">
-                      {/* Main horizontal roads */}
-                      <motion.line x1="0%" y1="35%" x2="100%" y2="35%" stroke="rgba(240,236,228,0.15)" strokeWidth="4"
+                      <motion.line x1="0%" y1="35%" x2="100%" y2="35%" stroke="rgba(107,114,128,0.15)" strokeWidth="4"
                         initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.8, delay: 0.2 }} />
-                      <motion.line x1="0%" y1="65%" x2="100%" y2="65%" stroke="rgba(240,236,228,0.15)" strokeWidth="4"
+                      <motion.line x1="0%" y1="65%" x2="100%" y2="65%" stroke="rgba(107,114,128,0.15)" strokeWidth="4"
                         initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.8, delay: 0.3 }} />
-                      {/* Main vertical roads */}
-                      <motion.line x1="30%" y1="0%" x2="30%" y2="100%" stroke="rgba(240,236,228,0.12)" strokeWidth="3"
+                      <motion.line x1="30%" y1="0%" x2="30%" y2="100%" stroke="rgba(107,114,128,0.12)" strokeWidth="3"
                         initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.6, delay: 0.4 }} />
-                      <motion.line x1="70%" y1="0%" x2="70%" y2="100%" stroke="rgba(240,236,228,0.12)" strokeWidth="3"
+                      <motion.line x1="70%" y1="0%" x2="70%" y2="100%" stroke="rgba(107,114,128,0.12)" strokeWidth="3"
                         initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.6, delay: 0.5 }} />
-                      {/* Secondary streets */}
                       {[20, 50, 80].map((y, i) => (
-                        <motion.line key={`h-${i}`} x1="0%" y1={`${y}%`} x2="100%" y2={`${y}%`} stroke="rgba(240,236,228,0.06)" strokeWidth="1.5"
+                        <motion.line key={`h-${i}`} x1="0%" y1={`${y}%`} x2="100%" y2={`${y}%`} stroke="rgba(107,114,128,0.06)" strokeWidth="1.5"
                           initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.5, delay: 0.6 + i * 0.1 }} />
                       ))}
                       {[15, 45, 55, 85].map((x, i) => (
-                        <motion.line key={`v-${i}`} x1={`${x}%`} y1="0%" x2={`${x}%`} y2="100%" stroke="rgba(240,236,228,0.06)" strokeWidth="1.5"
+                        <motion.line key={`v-${i}`} x1={`${x}%`} y1="0%" x2={`${x}%`} y2="100%" stroke="rgba(107,114,128,0.06)" strokeWidth="1.5"
                           initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.5, delay: 0.7 + i * 0.1 }} />
                       ))}
                     </svg>
 
                     {/* Building blocks */}
-                    <motion.div className="absolute top-[40%] left-[10%] h-[20%] w-[15%] rounded-sm border border-ink-muted/10 bg-ink-muted/15"
+                    <motion.div className="absolute top-[40%] left-[10%] h-[20%] w-[15%] rounded-sm border border-gray-400/10 bg-gray-400/15"
                       initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, delay: 0.5 }} />
-                    <motion.div className="absolute top-[15%] left-[35%] h-[15%] w-[12%] rounded-sm border border-ink-muted/10 bg-ink-muted/12"
+                    <motion.div className="absolute top-[15%] left-[35%] h-[15%] w-[12%] rounded-sm border border-gray-400/10 bg-gray-400/12"
                       initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, delay: 0.6 }} />
-                    <motion.div className="absolute top-[70%] left-[75%] h-[18%] w-[18%] rounded-sm border border-ink-muted/10 bg-ink-muted/14"
+                    <motion.div className="absolute top-[70%] left-[75%] h-[18%] w-[18%] rounded-sm border border-gray-400/10 bg-gray-400/14"
                       initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, delay: 0.7 }} />
-                    <motion.div className="absolute top-[20%] right-[10%] h-[25%] w-[10%] rounded-sm border border-ink-muted/10 bg-ink-muted/10"
+                    <motion.div className="absolute top-[20%] right-[10%] h-[25%] w-[10%] rounded-sm border border-gray-400/10 bg-gray-400/10"
                       initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, delay: 0.55 }} />
 
                     {/* Gradient fade at bottom */}
-                    <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-panel via-panel/60 to-transparent" />
+                    <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-[var(--color-panel-resolved)] via-[var(--color-panel-resolved)]/60 to-transparent" />
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -343,9 +337,9 @@ function MapCard() {
               </AnimatePresence>
 
               <div className="absolute top-3 right-3">
-                <div className="flex items-center gap-1.5 rounded-full bg-ink/[0.05] px-2 py-0.5 backdrop-blur-sm">
+                <div className="flex items-center gap-1.5 rounded-full bg-[var(--color-ink-resolved)]/[0.05] px-2 py-0.5 backdrop-blur-sm">
                   <div className="h-1.5 w-1.5 rounded-full bg-success" />
-                  <span className="text-[9px] font-medium uppercase tracking-wide text-ink-muted">Live</span>
+                  <span className="text-[9px] font-medium uppercase tracking-wide text-[var(--color-ink-muted-resolved)]">Live</span>
                 </div>
               </div>
             </motion.div>
@@ -355,7 +349,7 @@ function MapCard() {
               {/* Location */}
               <div className="flex items-center gap-2">
                 <MapPin className="h-3.5 w-3.5 text-accent" />
-                <span className="text-sm font-medium text-ink/80">Cafe Medina, Vancouver</span>
+                <span className="text-sm font-medium text-[var(--color-ink-resolved)]/80">Cafe Medina, Vancouver</span>
               </div>
 
               {/* Expanded details */}
@@ -367,14 +361,14 @@ function MapCard() {
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <div className="my-3 h-px bg-ink/[0.06]" />
+                    <div className="my-3 h-px bg-[var(--color-ink-resolved)]/[0.06]" />
 
                     {/* Mini stats */}
                     <div className="grid grid-cols-3 gap-2">
                       {cardStats.map((s) => (
-                        <div key={s.label} className="rounded-lg border border-ink/[0.04] bg-ink/[0.02] px-2.5 py-2 text-center">
+                        <div key={s.label} className="rounded-lg border border-[var(--color-ink-resolved)]/[0.04] bg-[var(--color-ink-resolved)]/[0.02] px-2.5 py-2 text-center">
                           <div className={`text-sm font-bold ${s.cls}`}>{s.value}</div>
-                          <div className="text-[9px] uppercase tracking-wider text-ink-muted">{s.label}</div>
+                          <div className="text-[9px] uppercase tracking-wider text-[var(--color-ink-muted-resolved)]">{s.label}</div>
                         </div>
                       ))}
                     </div>
@@ -385,7 +379,7 @@ function MapCard() {
                         <Sparkles className="h-3 w-3 text-success" />
                         <span className="font-medium text-success">AI Recommended</span>
                       </div>
-                      <p className="mt-1 text-[11px] leading-relaxed text-ink-muted">
+                      <p className="mt-1 text-[11px] leading-relaxed text-[var(--color-ink-muted-resolved)]">
                         &ldquo;Street parking on Cambie St — free, 2 min walk, likely available at this hour.&rdquo;
                       </p>
                     </div>
@@ -406,7 +400,7 @@ function MapCard() {
 
       {/* Click hint */}
       <motion.p
-        className="mt-3 text-center text-[10px] text-ink-muted"
+        className="mt-3 text-center text-[10px] text-[var(--color-ink-muted-resolved)]"
         initial={{ opacity: 0 }}
         animate={{
           opacity: hovered && !expanded ? 0.8 : 0,

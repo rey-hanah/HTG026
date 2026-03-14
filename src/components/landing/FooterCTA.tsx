@@ -15,7 +15,7 @@ export default function FooterCTA() {
     <footer className="relative">
       {/* ── CTA Banner ── */}
       <section className="relative overflow-hidden py-28 lg:py-36">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-ink/[0.06] to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--color-ink-resolved)]/[0.06] to-transparent" />
 
         {/* Glow */}
         <div className="pointer-events-none absolute inset-0">
@@ -31,13 +31,13 @@ export default function FooterCTA() {
             <span className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
               Ready?
             </span>
-            <h2 className="mt-4 font-display text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+            <h2 className="mt-4 font-display text-3xl font-bold tracking-tight text-[var(--color-ink-resolved)] sm:text-4xl lg:text-5xl">
               Stop circling.{" "}
               <span className="bg-gradient-to-r from-accent to-accent-light bg-clip-text text-transparent">
                 Start parking.
               </span>
             </h2>
-            <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-ink-muted">
+            <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-[var(--color-ink-muted-resolved)]">
               Try SpotAI now — enter any Vancouver destination and get an
               AI-ranked parking recommendation in seconds.
             </p>
@@ -51,7 +51,7 @@ export default function FooterCTA() {
           >
             <Link
               href="/map"
-              className="group inline-flex items-center gap-2 rounded-full bg-accent px-8 py-4 text-sm font-semibold text-canvas transition-all hover:bg-accent-light hover:scale-[1.02] active:scale-[0.98]"
+              className="group inline-flex items-center gap-2 rounded-full bg-accent px-8 py-4 text-sm font-semibold text-white transition-all hover:bg-accent-light hover:scale-[1.02] active:scale-[0.98]"
             >
               Find Parking Now
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -60,7 +60,7 @@ export default function FooterCTA() {
               href="https://github.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-ink/[0.03] px-6 py-4 text-sm font-semibold text-ink transition-colors hover:bg-ink/[0.06]"
+              className="inline-flex items-center gap-2 rounded-full border border-[var(--color-ink-resolved)]/10 bg-[var(--color-ink-resolved)]/[0.03] px-6 py-4 text-sm font-semibold text-[var(--color-ink-resolved)] transition-colors hover:bg-[var(--color-ink-resolved)]/[0.06]"
             >
               <Github className="h-4 w-4" />
               View Source
@@ -70,34 +70,29 @@ export default function FooterCTA() {
       </section>
 
       {/* ── Bottom bar ── */}
-      <div className="border-t border-ink/[0.06]">
+      <div className="border-t border-[var(--color-ink-resolved)]/[0.06]">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-6 sm:flex-row">
           {/* Logo */}
           <div className="flex items-center gap-2">
             <div className="flex h-6 w-6 items-center justify-center rounded-md border border-accent/20 bg-accent/10">
               <MapPin className="h-3 w-3 text-accent" />
             </div>
-            <span className="font-display text-sm font-semibold text-ink">
+            <span className="font-display text-sm font-semibold text-[var(--color-ink-resolved)]">
               SpotAI
             </span>
           </div>
-
-          {/* Info */}
-          <p className="text-xs text-ink-muted">
-            Built solo for Hack the Galaxy 2026 — SFU WiCS
-          </p>
 
           {/* Links */}
           <div className="flex items-center gap-6">
             <a
               href="#features"
-              className="text-xs text-ink-muted transition-colors hover:text-ink"
+              className="text-xs text-[var(--color-ink-muted-resolved)] transition-colors hover:text-[var(--color-ink-resolved)]"
             >
               Features
             </a>
             <a
               href="#how-it-works"
-              className="text-xs text-ink-muted transition-colors hover:text-ink"
+              className="text-xs text-[var(--color-ink-muted-resolved)] transition-colors hover:text-[var(--color-ink-resolved)]"
             >
               How it Works
             </a>

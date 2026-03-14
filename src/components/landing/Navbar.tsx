@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, ArrowRight, Menu, X } from "lucide-react";
+import { MapPin, ArrowRight, Menu, X, Sun, Moon } from "lucide-react";
+import { useTheme } from "@/components/ThemeProvider";
 
 const links = [
   { name: "Features", href: "#features" },
@@ -13,6 +14,7 @@ const links = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 20);
@@ -30,7 +32,7 @@ export default function Navbar() {
       <nav
         className={`mx-auto mt-4 max-w-6xl px-6 transition-all duration-500 lg:px-10 ${
           scrolled
-            ? "mt-3 max-w-4xl rounded-2xl border border-ink/[0.06] bg-canvas/80 px-5 backdrop-blur-2xl"
+            ? "mt-3 max-w-4xl rounded-2xl border border-[var(--color-ink-resolved)]/[0.06] bg-[var(--color-canvas-resolved)]/80 backdrop-blur-2xl"
             : ""
         }`}
       >
@@ -40,7 +42,7 @@ export default function Navbar() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-accent/20 bg-accent/10">
               <MapPin className="h-4 w-4 text-accent" />
             </div>
-            <span className="font-display text-lg font-semibold tracking-tight text-ink">
+            <span className="font-display text-lg font-semibold tracking-tight text-[var(--color-ink-resolved)]">
               SpotAI
             </span>
           </Link>
@@ -51,35 +53,64 @@ export default function Navbar() {
               <a
                 key={l.name}
                 href={l.href}
-                className="text-sm text-ink-muted transition-colors hover:text-ink"
+                className="text-sm text-[var(--color-ink-muted-resolved)] transition-colors hover:text-[var(--color-ink-resolved)]"
               >
                 {l.name}
               </a>
             ))}
           </div>
 
-          {/* CTA — desktop */}
-          <Link
-            href="/map"
-            className="group hidden items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-canvas transition-all hover:bg-accent-light hover:scale-[1.02] active:scale-[0.97] md:inline-flex"
-          >
-            Open Map
-            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-          </Link>
+          {/* Right actions — desktop */}
+          <div className="hidden items-center gap-3 md:flex">
+            {/* Theme toggle */}
+            <button
+              onClick={toggleTheme}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-ink-resolved)]/[0.08] bg-[var(--color-ink-resolved)]/[0.03] text-[var(--color-ink-muted-resolved)] transition-colors hover:bg-[var(--color-ink-resolved)]/[0.06] hover:text-[var(--color-ink-resolved)]"
+              aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+            >
+              {theme === "dark" ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
+            </button>
+
+            {/* CTA */}
+            <Link
+              href="/map"
+              className="group inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-canvas transition-all hover:bg-accent-light hover:scale-[1.02] active:scale-[0.97]"
+            >
+              Open Map
+              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+          </div>
 
           {/* Mobile toggle */}
-          <button
-            onClick={() => setOpen(!open)}
-            className="relative z-20 text-ink md:hidden"
-            aria-label={open ? "Close menu" : "Open menu"}
-          >
-            <Menu
-              className={`h-5 w-5 transition-all duration-200 ${open ? "scale-0 opacity-0" : ""}`}
-            />
-            <X
-              className={`absolute inset-0 m-auto h-5 w-5 transition-all duration-200 ${open ? "" : "scale-0 opacity-0"}`}
-            />
-          </button>
+          <div className="flex items-center gap-2 md:hidden">
+            <button
+              onClick={toggleTheme}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-ink-resolved)]/[0.08] bg-[var(--color-ink-resolved)]/[0.03] text-[var(--color-ink-muted-resolved)]"
+              aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+            >
+              {theme === "dark" ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
+            </button>
+            <button
+              onClick={() => setOpen(!open)}
+              className="relative z-20 text-[var(--color-ink-resolved)]"
+              aria-label={open ? "Close menu" : "Open menu"}
+            >
+              <Menu
+                className={`h-5 w-5 transition-all duration-200 ${open ? "scale-0 opacity-0" : ""}`}
+              />
+              <X
+                className={`absolute inset-0 m-auto h-5 w-5 transition-all duration-200 ${open ? "" : "scale-0 opacity-0"}`}
+              />
+            </button>
+          </div>
         </div>
 
         {/* Mobile dropdown */}
@@ -91,13 +122,13 @@ export default function Navbar() {
               exit={{ opacity: 0, height: 0 }}
               className="overflow-hidden md:hidden"
             >
-              <div className="space-y-4 border-t border-ink/[0.06] py-6">
+              <div className="space-y-4 border-t border-[var(--color-ink-resolved)]/[0.06] py-6">
                 {links.map((l) => (
                   <a
                     key={l.name}
                     href={l.href}
                     onClick={() => setOpen(false)}
-                    className="block text-base text-ink-muted transition-colors hover:text-ink"
+                    className="block text-base text-[var(--color-ink-muted-resolved)] transition-colors hover:text-[var(--color-ink-resolved)]"
                   >
                     {l.name}
                   </a>
