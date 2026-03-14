@@ -23,7 +23,7 @@ interface MapProps {
   onMarkerClick?: (spot: ParkingSpot) => void;
 }
 
-function createMarkerIcon(type: string, isRecommended: boolean) {
+function createMarkerIcon(type: "free" | "paid" | "ev" | "unknown", isRecommended: boolean) {
   const color = isRecommended ? MARKER_COLORS.recommended : MARKER_COLORS[type] || MARKER_COLORS.unknown;
   const size = isRecommended ? 20 : 14;
   
