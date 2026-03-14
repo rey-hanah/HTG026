@@ -1,25 +1,177 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --font-display: "DM Sans", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+
+  /* Existing brand colors (kept for landing page) */
+  --color-canvas: #050608;
+  --color-panel: #0c0f15;
+  --color-panel-light: #141821;
+  --color-ink: #f0ece4;
+  --color-ink-muted: #6b7280;
+  --color-accent: #d4915c;
+  --color-accent-light: #eab07a;
+  --color-success: #34d399;
+  --color-divider: #1a1e28;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── Light mode (default) ── */
+:root {
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+  --card: #ffffff;
+  --card-foreground: #0a0a0a;
+  --popover: #ffffff;
+  --popover-foreground: #0a0a0a;
+  --primary: #7c3aed;
+  --primary-foreground: #ffffff;
+  --secondary: #f3f4f6;
+  --secondary-foreground: #111827;
+  --muted: #f3f4f6;
+  --muted-foreground: #6b7280;
+  --accent-ui: #f3f4f6;
+  --accent-ui-foreground: #111827;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #7c3aed;
+  --radius: 0.75rem;
+
+  /* Map page specific */
+  --sidebar-bg: #ffffff;
+  --sidebar-border: #e5e7eb;
+  --search-bg: rgba(255, 255, 255, 0.92);
+  --search-border: #e5e7eb;
+  --control-bg: rgba(255, 255, 255, 0.92);
+  --control-border: #e5e7eb;
+  --card-bg: #ffffff;
+  --card-bg-hover: #f9fafb;
+  --card-border: #e5e7eb;
+  --card-border-hover: #d1d5db;
+  --badge-free-bg: #dcfce7;
+  --badge-free-text: #15803d;
+  --badge-paid-bg: #fef3c7;
+  --badge-paid-text: #92400e;
+  --badge-ev-bg: #dbeafe;
+  --badge-ev-text: #1d4ed8;
+  --badge-unknown-bg: #f3f4f6;
+  --badge-unknown-text: #4b5563;
+  --recommended-bg: #f5f3ff;
+  --recommended-border: #a78bfa;
+  --ai-text: #6d28d9;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-tertiary: #9ca3af;
+  --btn-primary-bg: #7c3aed;
+  --btn-primary-hover: #6d28d9;
+  --btn-primary-text: #ffffff;
+  --filter-active-bg: #7c3aed;
+  --filter-active-text: #ffffff;
+  --filter-bg: #f3f4f6;
+  --filter-text: #4b5563;
+  --filter-hover: #e5e7eb;
+  --skeleton-bg: #f3f4f6;
+  --empty-text: #6b7280;
+  --error-bg: #fef2f2;
+  --error-border: #fca5a5;
+  --error-text: #b91c1c;
+}
+
+/* ── Dark mode ── */
+.dark {
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card: #0c0f15;
+  --card-foreground: #fafafa;
+  --popover: #0c0f15;
+  --popover-foreground: #fafafa;
+  --primary: #a78bfa;
+  --primary-foreground: #09090b;
+  --secondary: #1a1e28;
+  --secondary-foreground: #fafafa;
+  --muted: #1a1e28;
+  --muted-foreground: #9ca3af;
+  --accent-ui: #1a1e28;
+  --accent-ui-foreground: #fafafa;
+  --destructive: #ef4444;
+  --destructive-foreground: #fafafa;
+  --border: #1e2330;
+  --input: #1e2330;
+  --ring: #a78bfa;
+
+  /* Map page specific */
+  --sidebar-bg: #0c0f15;
+  --sidebar-border: #1e2330;
+  --search-bg: rgba(12, 15, 21, 0.92);
+  --search-border: #1e2330;
+  --control-bg: rgba(12, 15, 21, 0.92);
+  --control-border: #1e2330;
+  --card-bg: #111520;
+  --card-bg-hover: #161b28;
+  --card-border: #1e2330;
+  --card-border-hover: #2a3040;
+  --badge-free-bg: rgba(34, 197, 94, 0.15);
+  --badge-free-text: #4ade80;
+  --badge-paid-bg: rgba(245, 158, 11, 0.15);
+  --badge-paid-text: #fbbf24;
+  --badge-ev-bg: rgba(59, 130, 246, 0.15);
+  --badge-ev-text: #60a5fa;
+  --badge-unknown-bg: rgba(107, 114, 128, 0.15);
+  --badge-unknown-text: #9ca3af;
+  --recommended-bg: rgba(139, 92, 246, 0.1);
+  --recommended-border: #7c3aed;
+  --ai-text: #c4b5fd;
+  --text-primary: #f0ece4;
+  --text-secondary: #9ca3af;
+  --text-tertiary: #6b7280;
+  --btn-primary-bg: #7c3aed;
+  --btn-primary-hover: #8b5cf6;
+  --btn-primary-text: #ffffff;
+  --filter-active-bg: #7c3aed;
+  --filter-active-text: #ffffff;
+  --filter-bg: #1a1e28;
+  --filter-text: #9ca3af;
+  --filter-hover: #252a38;
+  --skeleton-bg: #1a1e28;
+  --empty-text: #6b7280;
+  --error-bg: rgba(239, 68, 68, 0.1);
+  --error-border: #7f1d1d;
+  --error-text: #fca5a5;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-body);
 }
 
+/* Leaflet map overrides */
 .leaflet-container {
   width: 100%;
   height: 100%;
   z-index: 1;
+}
+
+/* Leaflet popup styling for dark mode */
+.dark .leaflet-popup-content-wrapper {
+  background: #111520;
+  color: #f0ece4;
+  border: 1px solid #1e2330;
+}
+.dark .leaflet-popup-tip {
+  background: #111520;
+}
+
+/* Smooth theme transition */
+* {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+/* Exclude map tiles and markers from transition */
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  transition: none !important;
 }

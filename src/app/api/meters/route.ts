@@ -70,26 +70,37 @@ function parseMeters(results: any[]) {
       return null;
     }
 
-    // Parse rate info
-    let rate = "Unknown";
-    if (m.r_mf_9a_6p) {
-      rate = `$${m.r_mf_9a_6p}/hr`;
-    } else if (m.r_mf_6p_10) {
-      rate = `$${m.r_mf_6p_10}/hr (evening)`;
+    // Parse rate info - correct field names from Vancouver Open Data
+    let rate = "Paid parking";
+    if (m.rate_9am_6pm) {
+      rate = `${m.rate_9am_6pm}/hr (9am-6pm)`;
+      if (m.rate_6pm_10pm) {
+        rate += `, ${m.rate_6pm_10pm}/hr (6pm-10pm)`;
+      }
+    } else if (m.flat_rate) {
+      rate = `Flat rate: ${m.flat_rate}`;
     }
 
-    // Parse time limit
-    let timeLimit = m.t_mf_9a_6p ? `${m.t_mf_9a_6p} min` : undefined;
+    // Parse time limit - correct field names
+    let timeLimit = "";
+    if (m.time_limit_9am_6pm) {
+      timeLimit = `Max ${m.time_limit_9am_6pm} (9am-6pm)`;
+      if (m.time_limit_6pm_10pm) {
+        timeLimit += `, ${m.time_limit_6pm_10pm} (6pm-10pm)`;
+      }
+    }
+
+    const area = m.geo_local_area || "";
 
     return {
-      id: `meter-${m.meter_id || m.meterid || Math.random()}`,
-      name: `Street Parking - ${m.block || m.geo_local_area || "Meter"}`,
-      address: m.block || "",
+      id: `meter-${m.meter_id || m.object_id || Math.random()}`,
+      name: `Street Parking${area ? ` - ${area}` : ""}`,
+      address: m.meter_id ? `Meter #${m.meter_id}` : "",
       type: "paid" as const,
       lat: mLat,
       lng: mLng,
-      rate,
-      timeLimit,
+      rate: rate !== "Paid parking" ? rate : undefined,
+      timeLimit: timeLimit || undefined,
       source: "vancouver" as const,
     };
   }).filter(Boolean);
