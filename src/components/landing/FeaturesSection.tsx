@@ -43,9 +43,15 @@ function CardDecorator({
 }) {
   return (
     <div className="relative mx-auto size-36 duration-200 [--color-border:color-mix(in_oklab,var(--color-accent)25%,transparent)] group-hover:[--color-border:color-mix(in_oklab,var(--color-accent)50%,transparent)]">
+      {/* Grid pattern */}
       <div
         aria-hidden
         className="absolute inset-0 bg-[linear-gradient(to_right,var(--color-border)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-border)_1px,transparent_1px)] bg-[size:24px_24px]"
+      />
+      {/* Gradient fade from all four directions */}
+      <div
+        aria-hidden
+        className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,var(--color-canvas-resolved)_100%)]"
       />
       <div
         aria-hidden
@@ -79,7 +85,7 @@ export default function FeaturesSection() {
         </div>
 
         {/* Cards grid */}
-        <div className="mx-auto mt-16 grid gap-4 md:grid-cols-3">
+        <div className="mx-auto mt-16 grid gap-8 md:grid-cols-3">
           {features.map((feature) => (
             <Card
               key={feature.title}
