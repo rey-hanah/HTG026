@@ -24,7 +24,7 @@
   --card-foreground: #0a0a0a;
   --popover: #ffffff;
   --popover-foreground: #0a0a0a;
-  --primary: #7c3aed;
+  --primary: #d4915c;
   --primary-foreground: #ffffff;
   --secondary: #f3f4f6;
   --secondary-foreground: #111827;
@@ -36,7 +36,7 @@
   --destructive-foreground: #ffffff;
   --border: #e5e7eb;
   --input: #e5e7eb;
-  --ring: #7c3aed;
+  --ring: #d4915c;
   --radius: 0.75rem;
 
   /* Map page specific */
@@ -58,16 +58,16 @@
   --badge-ev-text: #1d4ed8;
   --badge-unknown-bg: #f3f4f6;
   --badge-unknown-text: #4b5563;
-  --recommended-bg: #f5f3ff;
-  --recommended-border: #a78bfa;
-  --ai-text: #6d28d9;
+  --recommended-bg: #fdf6f0;
+  --recommended-border: #eab07a;
+  --ai-text: #b06e2a;
   --text-primary: #111827;
   --text-secondary: #6b7280;
   --text-tertiary: #9ca3af;
-  --btn-primary-bg: #7c3aed;
-  --btn-primary-hover: #6d28d9;
+  --btn-primary-bg: #d4915c;
+  --btn-primary-hover: #c07a45;
   --btn-primary-text: #ffffff;
-  --filter-active-bg: #7c3aed;
+  --filter-active-bg: #d4915c;
   --filter-active-text: #ffffff;
   --filter-bg: #f3f4f6;
   --filter-text: #4b5563;
@@ -81,36 +81,36 @@
 
 /* ── Dark mode ── */
 .dark {
-  --background: #09090b;
-  --foreground: #fafafa;
+  --background: #050608;
+  --foreground: #f0ece4;
   --card: #0c0f15;
-  --card-foreground: #fafafa;
+  --card-foreground: #f0ece4;
   --popover: #0c0f15;
-  --popover-foreground: #fafafa;
-  --primary: #a78bfa;
-  --primary-foreground: #09090b;
+  --popover-foreground: #f0ece4;
+  --primary: #eab07a;
+  --primary-foreground: #050608;
   --secondary: #1a1e28;
-  --secondary-foreground: #fafafa;
+  --secondary-foreground: #f0ece4;
   --muted: #1a1e28;
   --muted-foreground: #9ca3af;
   --accent-ui: #1a1e28;
-  --accent-ui-foreground: #fafafa;
+  --accent-ui-foreground: #f0ece4;
   --destructive: #ef4444;
-  --destructive-foreground: #fafafa;
-  --border: #1e2330;
-  --input: #1e2330;
-  --ring: #a78bfa;
+  --destructive-foreground: #f0ece4;
+  --border: #1a1e28;
+  --input: #1a1e28;
+  --ring: #eab07a;
 
   /* Map page specific */
   --sidebar-bg: #0c0f15;
-  --sidebar-border: #1e2330;
+  --sidebar-border: #1a1e28;
   --search-bg: rgba(12, 15, 21, 0.92);
-  --search-border: #1e2330;
+  --search-border: #1a1e28;
   --control-bg: rgba(12, 15, 21, 0.92);
-  --control-border: #1e2330;
+  --control-border: #1a1e28;
   --card-bg: #111520;
   --card-bg-hover: #161b28;
-  --card-border: #1e2330;
+  --card-border: #1a1e28;
   --card-border-hover: #2a3040;
   --badge-free-bg: rgba(34, 197, 94, 0.15);
   --badge-free-text: #4ade80;
@@ -120,17 +120,17 @@
   --badge-ev-text: #60a5fa;
   --badge-unknown-bg: rgba(107, 114, 128, 0.15);
   --badge-unknown-text: #9ca3af;
-  --recommended-bg: rgba(139, 92, 246, 0.1);
-  --recommended-border: #7c3aed;
-  --ai-text: #c4b5fd;
+  --recommended-bg: rgba(212, 145, 92, 0.1);
+  --recommended-border: #d4915c;
+  --ai-text: #eab07a;
   --text-primary: #f0ece4;
   --text-secondary: #9ca3af;
   --text-tertiary: #6b7280;
-  --btn-primary-bg: #7c3aed;
-  --btn-primary-hover: #8b5cf6;
-  --btn-primary-text: #ffffff;
-  --filter-active-bg: #7c3aed;
-  --filter-active-text: #ffffff;
+  --btn-primary-bg: #d4915c;
+  --btn-primary-hover: #eab07a;
+  --btn-primary-text: #050608;
+  --filter-active-bg: #d4915c;
+  --filter-active-text: #050608;
   --filter-bg: #1a1e28;
   --filter-text: #9ca3af;
   --filter-hover: #252a38;
@@ -141,9 +141,25 @@
   --error-text: #fca5a5;
 }
 
+/* ── Light mode overrides for brand tokens ── */
+:root {
+  --color-canvas-resolved: #faf8f5;
+  --color-panel-resolved: #ffffff;
+  --color-panel-light-resolved: #f5f3f0;
+  --color-ink-resolved: #1a1a1a;
+  --color-ink-muted-resolved: #6b7280;
+}
+.dark {
+  --color-canvas-resolved: #050608;
+  --color-panel-resolved: #0c0f15;
+  --color-panel-light-resolved: #141821;
+  --color-ink-resolved: #f0ece4;
+  --color-ink-muted-resolved: #6b7280;
+}
+
 body {
-  background-color: var(--color-canvas);
-  color: var(--color-ink);
+  background-color: var(--color-canvas-resolved);
+  color: var(--color-ink-resolved);
   font-family: var(--font-body);
 }
 
