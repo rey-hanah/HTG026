@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export const StickyScroll = ({
@@ -11,11 +11,11 @@ export const StickyScroll = ({
     title: string;
     description: string;
     content?: React.ReactNode;
+    mobileContent?: React.ReactNode;
   }[];
   contentClassName?: string;
 }) => {
   const [activeCard, setActiveCard] = useState(0);
-  const sectionRef = useRef<HTMLDivElement>(null);
   const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
@@ -30,8 +30,7 @@ export const StickyScroll = ({
           }
         },
         {
-          // Trigger when step enters center 40% of viewport
-          rootMargin: "-30% 0px -30% 0px",
+          rootMargin: "-35% 0px -35% 0px",
           threshold: 0.1,
         }
       );
@@ -43,15 +42,18 @@ export const StickyScroll = ({
   }, [content.length]);
 
   return (
-    <div ref={sectionRef} className="relative">
-      <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-20">
+    <div className="relative">
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
         {/* Left: scrolling text steps */}
         <div className="relative">
           {content.map((item, index) => (
             <div
               key={item.title + index}
               ref={(el) => { stepRefs.current[index] = el; }}
-              className="py-20 first:pt-8 last:pb-8 lg:py-28 lg:first:pt-4 lg:last:pb-4"
+              className={cn(
+                "py-12 lg:py-16 first:pt-4 last:pb-4",
+                index > 0 && "border-t border-[var(--color-ink-resolved)]/[0.06]"
+              )}
             >
               <motion.div
                 animate={{
@@ -59,9 +61,16 @@ export const StickyScroll = ({
                 }}
                 transition={{ duration: 0.5, ease: "easeOut" }}
               >
-                <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-                  Step {index + 1}
-                </p>
+                {/* Step number circle */}
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/10 text-xs font-bold text-accent">
+                    {index + 1}
+                  </div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+                    Step {index + 1}
+                  </p>
+                </div>
+
                 <h3 className="text-2xl font-bold tracking-tight text-[var(--color-ink-resolved)] md:text-3xl">
                   {item.title}
                 </h3>
@@ -69,58 +78,59 @@ export const StickyScroll = ({
                   {item.description}
                 </p>
               </motion.div>
+
+              {/* Mobile: inline visual per step */}
+              {(item.mobileContent || item.content) && (
+                <div className="mt-8 lg:hidden">
+                  <div
+                    className={cn(
+                      "overflow-hidden rounded-[20px] bg-[var(--color-panel-light-resolved)] p-6 ring-1 ring-black/[0.04]",
+                      "dark:ring-white/[0.04]",
+                      contentClassName
+                    )}
+                  >
+                    <div className="flex min-h-[280px] items-center justify-center">
+                      {item.mobileContent ?? item.content ?? null}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>
 
-        {/* Right: sticky visual panel */}
-        <div className="hidden lg:flex lg:items-start">
-          <div className="sticky top-28 w-full">
-            <div
-              className={cn(
-                "relative overflow-hidden rounded-[24px] bg-accent/[0.06] border border-accent/10",
-                "aspect-[4/3] w-full",
-                contentClassName
-              )}
-            >
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeCard}
-                  initial={{ opacity: 0, y: 12, scale: 0.98 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -12, scale: 0.98 }}
-                  transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                  className="absolute inset-0 flex items-center justify-center p-8"
-                >
-                  {content[activeCard].content ?? null}
-                </motion.div>
-              </AnimatePresence>
+        {/* Right: sticky visual panel (desktop only) */}
+        <div className="hidden lg:block">
+          <div className="sticky top-32">
+            <div className="flex min-h-[calc(100vh-10rem)] items-center justify-center">
+              <div
+                className={cn(
+                  "relative w-full min-h-[480px] lg:min-h-[520px] overflow-hidden rounded-[24px]",
+                  "bg-[var(--color-panel-light-resolved)] shadow-lg ring-1 ring-black/[0.04]",
+                  "dark:ring-white/[0.04]",
+                  "p-10 lg:p-12",
+                  contentClassName
+                )}
+              >
+                {/* Render all cards, toggle visibility */}
+                {content.map((item, index) => (
+                  <motion.div
+                    key={item.title + index}
+                    animate={{
+                      opacity: activeCard === index ? 1 : 0,
+                    }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                    className={cn(
+                      "absolute inset-0 flex items-center justify-center p-10 lg:p-12",
+                      activeCard !== index && "pointer-events-none"
+                    )}
+                  >
+                    {item.content ?? null}
+                  </motion.div>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Mobile: show active card inline below each step */}
-      <div className="lg:hidden">
-        <div
-          className={cn(
-            "overflow-hidden rounded-[20px] bg-accent/[0.06] border border-accent/10",
-            "aspect-[4/3] w-full",
-            contentClassName
-          )}
-        >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeCard}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="flex h-full items-center justify-center p-6"
-            >
-              {content[activeCard].content ?? null}
-            </motion.div>
-          </AnimatePresence>
         </div>
       </div>
     </div>

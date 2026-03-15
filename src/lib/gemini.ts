@@ -12,21 +12,24 @@ interface ParkingDensity {
 }
 
 export async function rankParking(
-  destination: string, 
+  destination: string,
   spots: ParkingSpot[],
   driveTimeMinutes?: number | null,
-  parkingDensity?: ParkingDensity | null
+  parkingDensity?: ParkingDensity | null,
+  arrivalOffsetMinutes?: number | null
 ): Promise<GeminiRecommendation | null> {
   const now = new Date();
-  
-  // Calculate effective arrival time considering current travel time
-  const effectiveArrival = driveTimeMinutes 
-    ? new Date(now.getTime() + driveTimeMinutes * 60000)
-    : now;
 
-  const arrivalContext = driveTimeMinutes
-    ? `User is currently ${driveTimeMinutes} minutes away from destination (will arrive around ${effectiveArrival.toLocaleTimeString()}).`
-    : `User is at the destination.`;
+  // Calculate effective arrival time: user-chosen offset OR drive time OR now
+  const offsetMins = arrivalOffsetMinutes ?? driveTimeMinutes ?? 0;
+  const effectiveArrival = new Date(now.getTime() + offsetMins * 60000);
+
+  const arrivalContext =
+    driveTimeMinutes
+      ? `User is currently ~${driveTimeMinutes} min away by car (arriving ~${effectiveArrival.toLocaleTimeString()}).`
+      : arrivalOffsetMinutes
+      ? `User plans to arrive in ${arrivalOffsetMinutes} min (~${effectiveArrival.toLocaleTimeString()}).`
+      : `User is at the destination now.`;
 
   const densityContext = parkingDensity
     ? `Parking availability near destination: ${parkingDensity.totalSpots} total spots (${parkingDensity.freeSpots} free, ${parkingDensity.paidSpots} paid, ${parkingDensity.evSpots} EV).`

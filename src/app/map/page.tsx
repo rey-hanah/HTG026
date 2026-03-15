@@ -93,6 +93,7 @@ export default function Home() {
     setError(null);
     setSpots([]);
     setHasSearched(true);
+    setDriveTimeMinutes(null);
 
     try {
       console.log("Searching for:", query, "with radius:", currentRadius);
@@ -187,6 +188,24 @@ export default function Home() {
         (a, b) => (a.walkDistance || 999999) - (b.walkDistance || 999999)
       );
 
+      // Fetch drive time from user location to each parking spot (in parallel)
+      if (userLocation) {
+        const drivePromises = topSpots.map(async (spot) => {
+          try {
+            const res = await fetch(
+              `/api/drive?fromLat=${userLocation[0]}&fromLng=${userLocation[1]}&toLat=${spot.lat}&toLng=${spot.lng}`
+            );
+            const d = await res.json();
+            if (d.duration) {
+              spot.driveTime = `${Math.round(d.duration / 60)} min`;
+            }
+          } catch {
+            // silently skip
+          }
+        });
+        await Promise.all(drivePromises);
+      }
+
       // Calculate parking density for AI
       const parkingDensity = {
         totalSpots: allSpots.length,
@@ -203,7 +222,8 @@ export default function Home() {
             query,
             topSpots,
             travelMinutes || driveTimeMinutes,
-            parkingDensity
+            parkingDensity,
+            arrivalMinutes
           );
           if (rec && rec.best_index < topSpots.length) {
             const bestSpot = topSpots[rec.best_index];

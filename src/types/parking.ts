@@ -8,6 +8,7 @@ export interface ParkingSpot {
   walkTime?: string;
   walkDistance?: number;
   walkGeometry?: any; // GeoJSON geometry for walking route
+  driveTime?: string; // e.g. "8 min" driving from user location to this spot
   
   // Paid parking details
   rate?: string;
