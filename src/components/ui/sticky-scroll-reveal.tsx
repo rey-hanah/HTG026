@@ -31,7 +31,7 @@ export const StickyScroll = ({
         },
         {
           rootMargin: "-35% 0px -35% 0px",
-          threshold: 0.1,
+          threshold: 0.01,
         }
       );
       observer.observe(el);
@@ -51,7 +51,14 @@ export const StickyScroll = ({
               key={item.title + index}
               ref={(el) => { stepRefs.current[index] = el; }}
               className={cn(
-                "py-12 lg:py-16 first:pt-4 last:pb-4",
+                // Each step needs enough height to sit in the viewport trigger zone
+                // min-h-[40vh] ensures each step dominates the center when scrolled to
+                "flex flex-col justify-center py-16 lg:py-20 lg:min-h-[40vh]",
+                // First step: extra top padding so it starts in the trigger zone
+                index === 0 && "pt-8 lg:pt-12",
+                // Last step: extra bottom padding for scroll room
+                index === content.length - 1 && "pb-8 lg:pb-12",
+                // Divider between steps
                 index > 0 && "border-t border-[var(--color-ink-resolved)]/[0.06]"
               )}
             >

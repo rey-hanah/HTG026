@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getOperatorRates } from "@/lib/operatorPricing";
 
 const VANCOUVER_EV_API =
   "https://opendata.vancouver.ca/api/explore/v2.1/catalog/datasets/electric-vehicle-charging-stations/records";
@@ -41,10 +42,17 @@ export async function GET(request: NextRequest) {
       )
       .map((station: any) => {
         const operator = station.lot_operator || "City of Vancouver";
-        // The Vancouver open dataset doesn't expose a charger count field.
-        // We label it as a charging location; actual port count is unknown.
-        const isCity = operator.toLowerCase().includes("city of vancouver");
-        const rate = isCity ? "Free (City of Vancouver)" : "See operator";
+
+        // Look up real operator-based pricing
+        const operatorRates = getOperatorRates(operator);
+        let rate: string;
+        if (operatorRates) {
+          rate = operatorRates.summary;
+        } else {
+          // Unknown operator — generic fallback
+          const isCity = operator.toLowerCase().includes("city of vancouver");
+          rate = isCity ? "Free (City of Vancouver)" : "Paid (see operator kiosk)";
+        }
 
         return {
           id: `ev-van-${station.address
@@ -58,7 +66,7 @@ export async function GET(request: NextRequest) {
           lng: station.geo_point_2d.lon,
           chargers: 2, // dataset does not expose port count; 2 is a safe minimum
           rate,
-          operator,
+          operator: operatorRates?.operator ?? operator,
           isOperational: true,
           source: "ev" as const,
           neighborhood: station.geo_local_area || undefined,

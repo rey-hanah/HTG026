@@ -155,33 +155,17 @@ export default function ResultsPanel({
           loading={searchLoading}
         />
 
-        {/* Drive time + controls shown after search */}
+        {/* Controls shown after search */}
         {hasSearched && (
           <div className="mt-3 flex flex-col gap-2">
-            {driveTimeMinutes && (
-              <div
-                className="px-3 py-2 rounded-lg text-sm"
-                style={{
-                  background: "var(--control-bg)",
-                  border: "1px solid var(--control-border)",
-                }}
-              >
-                <span style={{ color: "var(--text-tertiary)" }}>Drive:</span>{" "}
-                <span
-                  className="font-medium"
-                  style={{ color: "var(--primary)" }}
-                >
-                  {driveTimeMinutes} min
-                </span>
-              </div>
-            )}
-            <RadiusControl
-              radius={radius}
-              onRadiusChange={onRadiusChange}
-            />
             <ArrivalTimeControl
               arrivalMinutes={arrivalMinutes}
               onArrivalChange={onArrivalChange}
+              driveTimeMinutes={driveTimeMinutes}
+            />
+            <RadiusControl
+              radius={radius}
+              onRadiusChange={onRadiusChange}
             />
           </div>
         )}

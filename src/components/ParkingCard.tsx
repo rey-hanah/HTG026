@@ -401,25 +401,7 @@ export default function ParkingCard({
             </div>
           )}
 
-          {/* Walk time overlay — bottom right */}
-          {spot.walkTime && (
-            <div className="absolute bottom-2 right-2">
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-black/60 text-white backdrop-blur-sm">
-                <Footprints className="w-3 h-3" />
-                {spot.walkTime}
-              </span>
-            </div>
-          )}
 
-          {/* Distance overlay — bottom left */}
-          {spot.walkDistance && (
-            <div className="absolute bottom-2 left-2">
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-black/60 text-white backdrop-blur-sm">
-                <MapPin className="w-3 h-3" />
-                {formatDistance(spot.walkDistance)}
-              </span>
-            </div>
-          )}
         </div>
 
         <div className="p-3">
@@ -472,6 +454,24 @@ export default function ParkingCard({
                   className="pt-2 border-t space-y-2"
                   style={{ borderColor: "var(--card-border)" }}
                 >
+                  {/* ── Walk distance & time ──────────────────────────── */}
+                  {(spot.walkTime || spot.walkDistance) && (
+                    <div className="flex items-center gap-3">
+                      {spot.walkDistance && (
+                        <div className="flex items-center gap-1.5 text-xs" style={{ color: "var(--text-secondary)" }}>
+                          <MapPin className="w-3.5 h-3.5 shrink-0" style={{ color: "var(--primary)" }} />
+                          <span className="font-medium">{formatDistance(spot.walkDistance)}</span>
+                        </div>
+                      )}
+                      {spot.walkTime && (
+                        <div className="flex items-center gap-1.5 text-xs" style={{ color: "var(--text-secondary)" }}>
+                          <Footprints className="w-3.5 h-3.5 shrink-0" style={{ color: "var(--primary)" }} />
+                          <span className="font-medium">{spot.walkTime} walk</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* ── Paid: rates ───────────────────────────────────── */}
                   {spot.type === "paid" && (
                     <div className="space-y-1">
