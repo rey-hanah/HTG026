@@ -1,31 +1,28 @@
 import { GeoLocation } from "@/types/parking";
 
 export async function geocodeAddress(query: string): Promise<GeoLocation | null> {
-  const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query + ", Vancouver")}`;
+  // Use our API route to avoid CORS and rate limiting issues
+  const url = `/api/geocode?q=${encodeURIComponent(query)}`;
   
   try {
-    const res = await fetch(url, {
-      headers: {
-        "User-Agent": "SpotAI/1.0 (Parking Finder)",
-      },
-    });
+    const res = await fetch(url);
     
     if (!res.ok) {
-      console.error("Nominatim API error:", res.status, res.statusText);
+      console.error("Geocoding API error:", res.status, res.statusText);
       return null;
     }
     
     const data = await res.json();
     
-    if (!data || !Array.isArray(data) || data.length === 0) {
-      console.error("No results from Nominatim");
+    if (data.error || !data.lat || !data.lng) {
+      console.error("Geocoding failed:", data.error || "Invalid response");
       return null;
     }
     
     return {
-      lat: parseFloat(data[0].lat),
-      lng: parseFloat(data[0].lon),
-      display_name: data[0].display_name,
+      lat: data.lat,
+      lng: data.lng,
+      display_name: query, // We don't get display_name from our API, use query
     };
   } catch (e) {
     console.error("Geocoding error:", e);

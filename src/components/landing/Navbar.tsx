@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, ArrowRight, Menu, X, Sun, Moon } from "lucide-react";
+import { ArrowRight, Menu, X, Sun, Moon } from "lucide-react";
 import { useTheme } from "@/components/ThemeProvider";
 
 const links = [
@@ -39,9 +40,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between py-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-accent/20 bg-accent/10">
-              <MapPin className="h-4 w-4 text-accent" />
-            </div>
+            <Image src="/logo.svg" alt="SpotAI logo" width={32} height={32} className="h-8 w-8" />
             <span className="font-display text-lg font-semibold tracking-tight text-[var(--color-ink-resolved)]">
               SpotAI
             </span>

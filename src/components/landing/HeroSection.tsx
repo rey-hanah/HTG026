@@ -266,32 +266,32 @@ function MapCard() {
                   >
                     <div className="absolute inset-0 bg-[var(--color-panel-light-resolved)]" />
                     <svg className="absolute inset-0 h-full w-full" preserveAspectRatio="none">
-                      <motion.line x1="0%" y1="35%" x2="100%" y2="35%" stroke="rgba(107,114,128,0.15)" strokeWidth="4"
+                      <motion.line x1="0%" y1="35%" x2="100%" y2="35%" stroke="var(--color-ink-muted-resolved)" strokeOpacity="0.15" strokeWidth="4"
                         initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.8, delay: 0.2 }} />
-                      <motion.line x1="0%" y1="65%" x2="100%" y2="65%" stroke="rgba(107,114,128,0.15)" strokeWidth="4"
+                      <motion.line x1="0%" y1="65%" x2="100%" y2="65%" stroke="var(--color-ink-muted-resolved)" strokeOpacity="0.15" strokeWidth="4"
                         initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.8, delay: 0.3 }} />
-                      <motion.line x1="30%" y1="0%" x2="30%" y2="100%" stroke="rgba(107,114,128,0.12)" strokeWidth="3"
+                      <motion.line x1="30%" y1="0%" x2="30%" y2="100%" stroke="var(--color-ink-muted-resolved)" strokeOpacity="0.12" strokeWidth="3"
                         initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.6, delay: 0.4 }} />
-                      <motion.line x1="70%" y1="0%" x2="70%" y2="100%" stroke="rgba(107,114,128,0.12)" strokeWidth="3"
+                      <motion.line x1="70%" y1="0%" x2="70%" y2="100%" stroke="var(--color-ink-muted-resolved)" strokeOpacity="0.12" strokeWidth="3"
                         initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.6, delay: 0.5 }} />
                       {[20, 50, 80].map((y, i) => (
-                        <motion.line key={`h-${i}`} x1="0%" y1={`${y}%`} x2="100%" y2={`${y}%`} stroke="rgba(107,114,128,0.06)" strokeWidth="1.5"
+                        <motion.line key={`h-${i}`} x1="0%" y1={`${y}%`} x2="100%" y2={`${y}%`} stroke="var(--color-ink-muted-resolved)" strokeOpacity="0.06" strokeWidth="1.5"
                           initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.5, delay: 0.6 + i * 0.1 }} />
                       ))}
                       {[15, 45, 55, 85].map((x, i) => (
-                        <motion.line key={`v-${i}`} x1={`${x}%`} y1="0%" x2={`${x}%`} y2="100%" stroke="rgba(107,114,128,0.06)" strokeWidth="1.5"
+                        <motion.line key={`v-${i}`} x1={`${x}%`} y1="0%" x2={`${x}%`} y2="100%" stroke="var(--color-ink-muted-resolved)" strokeOpacity="0.06" strokeWidth="1.5"
                           initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.5, delay: 0.7 + i * 0.1 }} />
                       ))}
                     </svg>
 
                     {/* Building blocks */}
-                    <motion.div className="absolute top-[40%] left-[10%] h-[20%] w-[15%] rounded-sm border border-gray-400/10 bg-gray-400/15"
+                    <motion.div className="absolute top-[40%] left-[10%] h-[20%] w-[15%] rounded-sm border border-[var(--color-ink-muted-resolved)]/10 bg-[var(--color-ink-muted-resolved)]/15"
                       initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, delay: 0.5 }} />
-                    <motion.div className="absolute top-[15%] left-[35%] h-[15%] w-[12%] rounded-sm border border-gray-400/10 bg-gray-400/12"
+                    <motion.div className="absolute top-[15%] left-[35%] h-[15%] w-[12%] rounded-sm border border-[var(--color-ink-muted-resolved)]/10 bg-[var(--color-ink-muted-resolved)]/12"
                       initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, delay: 0.6 }} />
-                    <motion.div className="absolute top-[70%] left-[75%] h-[18%] w-[18%] rounded-sm border border-gray-400/10 bg-gray-400/14"
+                    <motion.div className="absolute top-[70%] left-[75%] h-[18%] w-[18%] rounded-sm border border-[var(--color-ink-muted-resolved)]/10 bg-[var(--color-ink-muted-resolved)]/14"
                       initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, delay: 0.7 }} />
-                    <motion.div className="absolute top-[20%] right-[10%] h-[25%] w-[10%] rounded-sm border border-gray-400/10 bg-gray-400/10"
+                    <motion.div className="absolute top-[20%] right-[10%] h-[25%] w-[10%] rounded-sm border border-[var(--color-ink-muted-resolved)]/10 bg-[var(--color-ink-muted-resolved)]/10"
                       initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, delay: 0.55 }} />
 
                     {/* Gradient fade at bottom */}

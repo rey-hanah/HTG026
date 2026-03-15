@@ -26,11 +26,11 @@ const parkingDemandData = [
 const chartConfig = {
   downtown: {
     label: "Downtown",
-    color: "hsl(22, 56%, 59%)",
+    color: "var(--color-accent)",
   },
   residential: {
     label: "Residential",
-    color: "hsl(142, 71%, 45%)",
+    color: "var(--color-success)",
   },
 } satisfies ChartConfig;
 

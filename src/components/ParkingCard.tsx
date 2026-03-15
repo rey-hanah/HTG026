@@ -12,6 +12,10 @@ import {
   Timer,
   Navigation,
   Sparkles,
+  Footprints,
+  ExternalLink,
+  Apple,
+  TrendingUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -19,8 +23,8 @@ interface ParkingCardProps {
   spot: ParkingSpot;
   isRecommended?: boolean;
   onNavigate: () => void;
+  onAppleMapsNavigate?: () => void;
   onClick?: () => void;
-  /** If true, renders the compact static version for map popups (no animation) */
   isPopup?: boolean;
 }
 
@@ -47,17 +51,21 @@ const TYPE_CONFIG: Record<
     bgVar: "var(--badge-ev-bg)",
   },
   unknown: {
-    label: "UNKNOWN",
+    label: "PARKING",
     icon: MapPin,
     colorVar: "var(--badge-unknown-text)",
     bgVar: "var(--badge-unknown-bg)",
   },
 };
 
-// Generate a static map tile image URL from the spot's real coordinates
-// Uses OpenStreetMap tile server: tile URLs follow the pattern /zoom/x/y.png
-function getStaticMapUrl(lat: number, lng: number, zoom = 16): string {
-  // Convert lat/lng to tile coordinates
+// Generate Google Street View Static API URL
+function getStreetViewUrl(lat: number, lng: number): string {
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  if (apiKey) {
+    return `https://maps.googleapis.com/maps/api/streetview?size=400x200&location=${lat},${lng}&fov=90&heading=235&pitch=10&key=${apiKey}`;
+  }
+  // Fallback to OSM tile
+  const zoom = 17;
   const n = Math.pow(2, zoom);
   const x = Math.floor(((lng + 180) / 360) * n);
   const latRad = (lat * Math.PI) / 180;
@@ -73,13 +81,21 @@ function formatDistance(meters?: number): string {
   return `${(meters / 1000).toFixed(1)}km`;
 }
 
+function getGoogleMapsUrl(lat: number, lng: number): string {
+  return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=walking`;
+}
+
+function getAppleMapsUrl(lat: number, lng: number, name: string): string {
+  return `https://maps.apple.com/?daddr=${lat},${lng}&dirflg=w&t=m`;
+}
+
 const detailVariants = {
   hidden: { opacity: 0, height: 0, marginTop: 0 },
   visible: {
     opacity: 1,
     height: "auto",
     marginTop: "0.75rem",
-    transition: { duration: 0.3, ease: "easeInOut" as const },
+    transition: { duration: 0.25, ease: "easeOut" as const },
   },
 };
 
@@ -94,19 +110,22 @@ export default function ParkingCard({
   const config = TYPE_CONFIG[spot.type] || TYPE_CONFIG.unknown;
   const Icon = config.icon;
 
-  // Static popup card for map markers (no animation)
+  // Compact popup card for map markers
   if (isPopup) {
     return (
       <div
         className="rounded-lg overflow-hidden"
         style={{
           background: "var(--card-bg)",
-          border: `1px solid var(--card-border)`,
-          minWidth: 220,
+          border: isRecommended 
+            ? "2px solid var(--primary)" 
+            : "1px solid var(--card-border)",
+          minWidth: 260,
         }}
       >
         <div className="p-3">
-          <div className="flex items-center justify-between mb-1.5">
+          {/* Header with type and walk time */}
+          <div className="flex items-center justify-between mb-2">
             <span
               className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold"
               style={{ background: config.bgVar, color: config.colorVar }}
@@ -119,22 +138,111 @@ export default function ParkingCard({
                 className="text-xs flex items-center gap-1"
                 style={{ color: "var(--text-secondary)" }}
               >
-                <Clock className="w-3 h-3" />
+                <Footprints className="w-3 h-3" />
                 {spot.walkTime}
               </span>
             )}
           </div>
+
+          {/* Name */}
           <h4
-            className="text-sm font-semibold line-clamp-1"
+            className="text-sm font-semibold line-clamp-1 mb-1"
             style={{ color: "var(--text-primary)" }}
           >
             {spot.name}
           </h4>
-          {spot.rate && (
-            <p className="text-xs mt-1" style={{ color: "var(--text-secondary)" }}>
-              {spot.rate}
-            </p>
+
+          {/* Distance */}
+          {spot.walkDistance && (
+            <div className="flex items-center gap-1 text-xs mb-2" style={{ color: "var(--text-tertiary)" }}>
+              <MapPin className="w-3 h-3" />
+              {formatDistance(spot.walkDistance)} away
+            </div>
           )}
+
+          {/* Details based on type */}
+          <div className="space-y-1 text-xs" style={{ color: "var(--text-secondary)" }}>
+            {spot.type === "paid" && spot.rate && (
+              <div className="flex items-center gap-2">
+                <DollarSign className="w-3 h-3 shrink-0" style={{ color: "var(--badge-paid-text)" }} />
+                <span>{spot.rate}</span>
+              </div>
+            )}
+            
+            {spot.type === "free" && spot.timeLimit && (
+              <div className="flex items-center gap-2">
+                <Timer className="w-3 h-3 shrink-0" style={{ color: "var(--badge-free-text)" }} />
+                <span>{spot.timeLimit}</span>
+              </div>
+            )}
+            
+            {spot.type === "ev" && spot.chargers && (
+              <div className="flex items-center gap-2">
+                <Zap className="w-3 h-3 shrink-0" style={{ color: "var(--badge-ev-text)" }} />
+                <span>
+                  {spot.chargers} charger{spot.chargers > 1 ? "s" : ""}
+                  {spot.operator ? ` - ${spot.operator}` : ""}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* AI prediction */}
+          {spot.availabilityEstimate && (
+            <div className="mt-2 flex items-center gap-1">
+              <TrendingUp className="w-3 h-3" style={{ color: "var(--primary)" }} />
+               <span
+                className={cn(
+                  "text-[10px] font-semibold",
+                  spot.availabilityEstimate === "likely available"
+                    ? "text-success"
+                    : spot.availabilityEstimate === "might be busy"
+                    ? "text-accent"
+                    : "text-destructive"
+                )}
+              >
+                {spot.availabilityEstimate === "likely available"
+                  ? "Likely available"
+                  : spot.availabilityEstimate === "might be busy"
+                  ? "Might be busy"
+                  : "Probably full"}
+              </span>
+            </div>
+          )}
+
+          {/* Navigation buttons */}
+          <div className="flex gap-2 mt-3">
+            <a
+              href={getGoogleMapsUrl(spot.lat, spot.lng)}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="flex-1 py-1.5 rounded-md text-[10px] font-medium transition-colors flex items-center justify-center gap-1"
+              style={{
+                background: "var(--btn-secondary-bg)",
+                color: "var(--btn-secondary-text)",
+                border: "1px solid var(--btn-secondary-border)",
+              }}
+            >
+              <Navigation className="w-3 h-3" />
+              Google
+            </a>
+            <a
+              href={getAppleMapsUrl(spot.lat, spot.lng, spot.name)}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="flex-1 py-1.5 rounded-md text-[10px] font-medium transition-colors flex items-center justify-center gap-1"
+              style={{
+                background: "var(--btn-secondary-bg)",
+                color: "var(--btn-secondary-text)",
+                border: "1px solid var(--btn-secondary-border)",
+              }}
+            >
+              <Apple className="w-3 h-3" />
+              Apple
+            </a>
+          </div>
         </div>
       </div>
     );
@@ -145,35 +253,33 @@ export default function ParkingCard({
     <motion.div
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      whileHover={{ y: -4 }}
-      transition={{ duration: 0.25, ease: [0.25, 1, 0.5, 1] }}
+      whileHover={{ y: -2 }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
       className="w-full cursor-pointer"
       onClick={onClick}
     >
       <div
         className={cn(
-          "overflow-hidden rounded-xl transition-shadow duration-300",
-          isHovered ? "shadow-xl" : "shadow-sm"
+          "overflow-hidden rounded-xl transition-all duration-300",
+          isHovered ? "shadow-lg" : "shadow-sm"
         )}
         style={{
-          background: isRecommended
-            ? "var(--recommended-bg)"
-            : "var(--card-bg)",
+          background: "var(--card-bg)",
           border: isRecommended
-            ? `2px solid var(--recommended-border)`
-            : `1px solid var(--card-border)`,
+            ? "2px solid var(--primary)"
+            : "1px solid var(--card-border)",
         }}
       >
         {/* Card Image */}
         <div className="relative h-28 w-full overflow-hidden">
           <img
-            src={getStaticMapUrl(spot.lat, spot.lng)}
+            src={spot.streetViewUrl || getStreetViewUrl(spot.lat, spot.lng)}
             alt={spot.name}
             className="h-full w-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
 
-          {/* Type badge overlaid on image */}
+          {/* Type badge */}
           <div className="absolute top-2 left-2">
             <span
               className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold backdrop-blur-sm"
@@ -187,7 +293,10 @@ export default function ParkingCard({
           {/* AI recommended badge */}
           {isRecommended && (
             <div className="absolute top-2 right-2">
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold backdrop-blur-sm" style={{ background: "rgba(212, 145, 92, 0.9)", color: "#ffffff" }}>
+              <span 
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold backdrop-blur-sm"
+                style={{ background: "var(--primary)", color: "#ffffff" }}
+              >
                 <Sparkles className="w-3 h-3" />
                 AI PICK
               </span>
@@ -198,15 +307,25 @@ export default function ParkingCard({
           {spot.walkTime && (
             <div className="absolute bottom-2 right-2">
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-black/60 text-white backdrop-blur-sm">
-                <Clock className="w-3 h-3" />
-                {spot.walkTime} walk
+                <Footprints className="w-3 h-3" />
+                {spot.walkTime}
+              </span>
+            </div>
+          )}
+
+          {/* Distance bottom-left */}
+          {spot.walkDistance && (
+            <div className="absolute bottom-2 left-2">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-black/60 text-white backdrop-blur-sm">
+                <MapPin className="w-3 h-3" />
+                {formatDistance(spot.walkDistance)}
               </span>
             </div>
           )}
         </div>
 
         <div className="p-3">
-          {/* Always visible: name + distance */}
+          {/* Name + address */}
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
               <h3
@@ -224,17 +343,9 @@ export default function ParkingCard({
                 </p>
               )}
             </div>
-            {spot.walkDistance && (
-              <span
-                className="text-xs font-medium whitespace-nowrap"
-                style={{ color: "var(--text-secondary)" }}
-              >
-                {formatDistance(spot.walkDistance)}
-              </span>
-            )}
           </div>
 
-          {/* Animated detail section on hover */}
+          {/* Expanded details on hover */}
           <AnimatePresence>
             {isHovered && (
               <motion.div
@@ -245,53 +356,67 @@ export default function ParkingCard({
                 variants={detailVariants}
                 className="overflow-hidden"
               >
-                <div className="space-y-1.5 text-xs" style={{ color: "var(--text-secondary)" }}>
-                  {spot.type === "paid" && spot.rate && (
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="w-3 h-3 shrink-0" style={{ color: "var(--text-tertiary)" }} />
-                      <span>{spot.rate}</span>
+                <div 
+                  className="pt-2 border-t space-y-2"
+                  style={{ borderColor: "var(--card-border)" }}
+                >
+                  {/* Paid parking rates */}
+                  {spot.type === "paid" && (
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-xs">
+                        <DollarSign className="w-3.5 h-3.5 shrink-0" style={{ color: "var(--badge-paid-text)" }} />
+                        <span style={{ color: "var(--text-primary)" }} className="font-medium">Rates</span>
+                      </div>
+                      <div className="pl-5 space-y-0.5 text-xs" style={{ color: "var(--text-secondary)" }}>
+                        {spot.rateDetails?.daytime && <p>{spot.rateDetails.daytime}</p>}
+                        {spot.rateDetails?.evening && <p>{spot.rateDetails.evening}</p>}
+                        {!spot.rateDetails && spot.rate && <p>{spot.rate}</p>}
+                      </div>
                     </div>
                   )}
 
-                  {spot.type === "free" && spot.timeLimit && (
-                    <div className="flex items-center gap-2">
-                      <Timer className="w-3 h-3 shrink-0" style={{ color: "var(--text-tertiary)" }} />
-                      <span>Max stay: {spot.timeLimit}</span>
+                  {/* Free parking time limits */}
+                  {spot.type === "free" && (
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-xs">
+                        <Timer className="w-3.5 h-3.5 shrink-0" style={{ color: "var(--badge-free-text)" }} />
+                        <span style={{ color: "var(--text-primary)" }} className="font-medium">Time Limit</span>
+                      </div>
+                      <div className="pl-5 space-y-0.5 text-xs" style={{ color: "var(--text-secondary)" }}>
+                        {spot.timeLimitDetails?.daytime && <p>{spot.timeLimitDetails.daytime}</p>}
+                        {spot.timeLimitDetails?.evening && <p>{spot.timeLimitDetails.evening}</p>}
+                        {!spot.timeLimitDetails && spot.timeLimit && <p>{spot.timeLimit}</p>}
+                      </div>
                     </div>
                   )}
 
-                  {spot.chargers && spot.type === "ev" && (
-                    <div className="flex items-center gap-2">
-                      <Zap className="w-3 h-3 shrink-0" style={{ color: "var(--text-tertiary)" }} />
-                      <span>
-                        {spot.chargers} charger{spot.chargers > 1 ? "s" : ""}
-                        {spot.operator ? ` (${spot.operator})` : ""}
-                      </span>
+                  {/* EV charger info */}
+                  {spot.type === "ev" && (
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-xs">
+                        <Zap className="w-3.5 h-3.5 shrink-0" style={{ color: "var(--badge-ev-text)" }} />
+                        <span style={{ color: "var(--text-primary)" }} className="font-medium">EV Charging</span>
+                      </div>
+                      <div className="pl-5 space-y-0.5 text-xs" style={{ color: "var(--text-secondary)" }}>
+                        <p>{spot.chargers || 1} charger{(spot.chargers || 1) > 1 ? "s" : ""} available</p>
+                        {spot.operator && <p>Operated by {spot.operator}</p>}
+                        {spot.rate && <p>{spot.rate}</p>}
+                      </div>
                     </div>
                   )}
 
-                  {spot.source === "vancouver" && (
-                    <span className="text-[10px]" style={{ color: "var(--text-tertiary)" }}>
-                      Vancouver Open Data
-                    </span>
-                  )}
-                </div>
-
-                {/* AI recommendation reason */}
-                {isRecommended && spot.aiReason && (
-                  <div className="mt-2">
-                    <p className="text-xs italic" style={{ color: "var(--ai-text)" }}>
-                      &ldquo;{spot.aiReason}&rdquo;
-                    </p>
-                    {spot.availabilityEstimate && (
-                      <span
+                  {/* AI availability prediction */}
+                  {spot.availabilityEstimate && (
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="w-3.5 h-3.5 shrink-0" style={{ color: "var(--primary)" }} />
+                       <span
                         className={cn(
-                          "text-[10px] font-semibold mt-1 inline-block",
+                          "text-xs font-medium",
                           spot.availabilityEstimate === "likely available"
-                            ? "text-green-500"
+                            ? "text-success"
                             : spot.availabilityEstimate === "might be busy"
-                            ? "text-amber-500"
-                            : "text-red-500"
+                            ? "text-accent"
+                            : "text-destructive"
                         )}
                       >
                         {spot.availabilityEstimate === "likely available"
@@ -300,33 +425,52 @@ export default function ParkingCard({
                           ? "Might be busy"
                           : "Probably full"}
                       </span>
-                    )}
-                  </div>
-                )}
+                    </div>
+                  )}
 
-                {/* Navigate button */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onNavigate();
-                  }}
-                  className="w-full mt-2.5 py-2 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1.5"
-                  style={{
-                    background: "var(--btn-primary-bg)",
-                    color: "var(--btn-primary-text)",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.background =
-                      "var(--btn-primary-hover)")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.background =
-                      "var(--btn-primary-bg)")
-                  }
-                >
-                  <Navigation className="w-3 h-3" />
-                  Open in Google Maps
-                </button>
+                  {/* AI reason */}
+                  {isRecommended && spot.aiReason && (
+                    <p 
+                      className="text-xs italic pl-0.5"
+                      style={{ color: "var(--text-tertiary)" }}
+                    >
+                      "{spot.aiReason}"
+                    </p>
+                  )}
+
+                  {/* Navigation buttons */}
+                  <div className="flex gap-2 pt-1">
+                    <a
+                      href={getGoogleMapsUrl(spot.lat, spot.lng)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex-1 py-2 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1.5 hover:opacity-90"
+                      style={{
+                        background: "var(--btn-primary-bg)",
+                        color: "var(--btn-primary-text)",
+                      }}
+                    >
+                      <Navigation className="w-3.5 h-3.5" />
+                      Google Maps
+                    </a>
+                    <a
+                      href={getAppleMapsUrl(spot.lat, spot.lng, spot.name)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex-1 py-2 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1.5 hover:opacity-90"
+                      style={{
+                        background: "var(--btn-secondary-bg)",
+                        color: "var(--btn-secondary-text)",
+                        border: "1px solid var(--btn-secondary-border)",
+                      }}
+                    >
+                      <Apple className="w-3.5 h-3.5" />
+                      Apple Maps
+                    </a>
+                  </div>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>

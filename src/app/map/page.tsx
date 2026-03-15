@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import dynamic from "next/dynamic";
 import ResultsPanel from "@/components/ResultsPanel";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -33,10 +33,30 @@ export default function Home() {
   const [radius, setRadius] = useState(500);
   const [hasSearched, setHasSearched] = useState(false);
   const [arrivalMinutes, setArrivalMinutes] = useState<number | null>(null);
-  const [userLocation, setUserLocation] = useState<[number, number] | null>(
-    null
-  );
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [driveTimeMinutes, setDriveTimeMinutes] = useState<number | null>(null);
+  const [isLocating, setIsLocating] = useState(false);
+
+  // Auto-detect user location on mount
+  useEffect(() => {
+    if (navigator.geolocation) {
+      setIsLocating(true);
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setUserLocation([latitude, longitude]);
+          setCenter([latitude, longitude]);
+          setZoom(14);
+          setIsLocating(false);
+        },
+        () => {
+          // Silently fail - use default center
+          setIsLocating(false);
+        },
+        { timeout: 10000, enableHighAccuracy: false }
+      );
+    }
+  }, []);
 
   const handleUserLocationSelect = async (lat: number, lng: number) => {
     setUserLocation([lat, lng]);
@@ -49,7 +69,7 @@ export default function Home() {
     fromLng: number,
     toLat: number,
     toLng: number
-  ) => {
+  ): Promise<number | null> => {
     try {
       const res = await fetch(
         `/api/drive?fromLat=${fromLat}&fromLng=${fromLng}&toLat=${toLat}&toLng=${toLng}`
@@ -64,7 +84,7 @@ export default function Home() {
     return null;
   };
 
-  const handleSearch = async (query: string, searchRadius?: number) => {
+  const handleSearch = useCallback(async (query: string, searchRadius?: number) => {
     const currentRadius = searchRadius ?? radius;
     setLoading(true);
     setDestination(query);
@@ -109,7 +129,7 @@ export default function Home() {
         }
       }
 
-      // Fetch all parking data in parallel with radius
+      // Fetch all parking data in parallel
       console.log("Fetching parking data...");
       const [osmSpots, meters, evChargers] = await Promise.all([
         fetchParkingFromOSM(lat, lng, currentRadius),
@@ -129,7 +149,7 @@ export default function Home() {
       const allSpots: ParkingSpot[] = [...osmSpots, ...meters, ...evChargers];
 
       if (allSpots.length === 0) {
-        setError("No parking found nearby. Try a different location.");
+        setError("No parking found nearby. Try increasing the radius or a different location.");
         setLoading(false);
         return;
       }
@@ -143,9 +163,9 @@ export default function Home() {
       }));
 
       spotsWithDistance.sort((a, b) => a.straightDistance - b.straightDistance);
-      const topSpots = spotsWithDistance.slice(0, 8);
+      const topSpots = spotsWithDistance.slice(0, 10);
 
-      // Batch fetch walk times in parallel
+      // Batch fetch walk times
       console.log("Calculating walk times...");
       const walkResults = await getWalkTimesBatch(
         lat,
@@ -162,14 +182,12 @@ export default function Home() {
         }
       });
 
-      // Sort by walk time
+      // Sort by walk distance
       topSpots.sort(
         (a, b) => (a.walkDistance || 999999) - (b.walkDistance || 999999)
       );
 
-      setSpots(topSpots);
-
-      // Calculate parking density from heatmap data
+      // Calculate parking density for AI
       const parkingDensity = {
         totalSpots: allSpots.length,
         freeSpots: allSpots.filter((s) => s.type === "free").length,
@@ -177,14 +195,14 @@ export default function Home() {
         evSpots: allSpots.filter((s) => s.type === "ev").length,
       };
 
-      // Get AI recommendation
+      // Get AI recommendation with drive time context
       console.log("Getting AI recommendation...");
       if (topSpots.length > 0) {
         try {
           const rec = await rankParking(
             query,
             topSpots,
-            driveTimeMinutes,
+            travelMinutes || driveTimeMinutes,
             parkingDensity
           );
           if (rec && rec.best_index < topSpots.length) {
@@ -192,14 +210,40 @@ export default function Home() {
             bestSpot.aiRecommended = true;
             bestSpot.aiReason = rec.reason;
             bestSpot.availabilityEstimate = rec.availability_estimate;
+            
+            // Also add availability estimates to other spots based on type/time
+            topSpots.forEach((spot, i) => {
+              if (i !== rec.best_index && !spot.availabilityEstimate) {
+                // Simple heuristic based on spot type and time
+                const hour = new Date().getHours();
+                const isRushHour = (hour >= 7 && hour <= 9) || (hour >= 17 && hour <= 19);
+                const isLunchTime = hour >= 11 && hour <= 13;
+                
+                if (spot.type === "free") {
+                  spot.availabilityEstimate = isRushHour || isLunchTime ? "might be busy" : "likely available";
+                } else if (spot.type === "paid") {
+                  spot.availabilityEstimate = isRushHour ? "might be busy" : "likely available";
+                } else {
+                  spot.availabilityEstimate = "likely available";
+                }
+              }
+            });
+            
             setRecommendedId(bestSpot.id);
-            setSpots([...topSpots]);
           }
         } catch (e) {
           console.warn("AI recommendation failed:", e);
         }
       }
 
+      // Move recommended spot to top
+      const sortedSpots = [...topSpots].sort((a, b) => {
+        if (a.aiRecommended) return -1;
+        if (b.aiRecommended) return 1;
+        return 0;
+      });
+
+      setSpots(sortedSpots);
       console.log("Search complete!");
     } catch (e) {
       console.error("Search error:", e);
@@ -207,7 +251,7 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [radius, userLocation, driveTimeMinutes]);
 
   const handleNavigate = (spot: ParkingSpot) => {
     const url = `https://www.google.com/maps/dir/?api=1&destination=${spot.lat},${spot.lng}&travelmode=walking`;
@@ -239,7 +283,6 @@ export default function Home() {
       className="h-screen flex flex-col md:flex-row"
       style={{ background: "var(--background)" }}
     >
-      {/* Sidebar with all controls + results */}
       <ResultsPanel
         spots={spots}
         loading={loading}
@@ -261,8 +304,20 @@ export default function Home() {
         headerActions={<ThemeToggle />}
       />
 
-      {/* Map */}
-      <div className="flex-1 h-[50vh] md:h-full">
+      <div className="flex-1 h-[50vh] md:h-full relative">
+        {isLocating && (
+          <div 
+            className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] px-3 py-2 rounded-lg text-xs font-medium"
+            style={{
+              background: "var(--control-bg)",
+              color: "var(--text-secondary)",
+              border: "1px solid var(--control-border)",
+              backdropFilter: "blur(8px)",
+            }}
+          >
+            Detecting your location...
+          </div>
+        )}
         <Map
           center={center}
           zoom={zoom}

@@ -6,6 +6,7 @@ import SearchBar from "./SearchBar";
 import RadiusControl from "./RadiusControl";
 import ArrivalTimeControl from "./ArrivalTimeControl";
 import { Sparkles, PanelLeftClose, PanelLeft, Car, MapPin } from "lucide-react";
+import Image from "next/image";
 import { useState, ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -122,7 +123,7 @@ export default function ResultsPanel({
           className="flex items-center gap-1.5"
           style={{ color: "var(--primary)" }}
         >
-          <MapPin className="w-5 h-5" />
+          <Image src="/logo.svg" alt="SpotAI logo" width={20} height={20} className="w-5 h-5" />
           <span
             className="text-sm font-bold"
             style={{ fontFamily: "var(--font-display)" }}

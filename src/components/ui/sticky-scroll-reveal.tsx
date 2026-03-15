@@ -1,7 +1,6 @@
 "use client";
-
 import React, { useEffect, useRef, useState } from "react";
-import { useMotionValueEvent, useScroll, motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export const StickyScroll = ({
@@ -15,89 +14,115 @@ export const StickyScroll = ({
   }[];
   contentClassName?: string;
 }) => {
-  const [activeCard, setActiveCard] = React.useState(0);
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    container: ref,
-    offset: ["start start", "end start"],
-  });
-  const cardLength = content.length;
-
-  useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    const cardsBreakpoints = content.map((_, index) => index / cardLength);
-    const closestBreakpointIndex = cardsBreakpoints.reduce(
-      (acc, breakpoint, index) => {
-        const distance = Math.abs(latest - breakpoint);
-        if (distance < Math.abs(latest - cardsBreakpoints[acc])) {
-          return index;
-        }
-        return acc;
-      },
-      0
-    );
-    setActiveCard(closestBreakpointIndex);
-  });
-
-  const backgroundColors = [
-    "var(--color-canvas-resolved)",
-    "var(--color-canvas-resolved)",
-    "var(--color-canvas-resolved)",
-  ];
-
-  const linearGradients = [
-    "linear-gradient(to bottom right, rgb(212 145 92 / 0.6), rgb(52 211 153 / 0.6))",
-    "linear-gradient(to bottom right, rgb(212 145 92 / 0.8), rgb(234 176 122 / 0.6))",
-    "linear-gradient(to bottom right, rgb(52 211 153 / 0.6), rgb(212 145 92 / 0.6))",
-  ];
-
-  const [backgroundGradient, setBackgroundGradient] = useState(
-    linearGradients[0]
-  );
+  const [activeCard, setActiveCard] = useState(0);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    setBackgroundGradient(linearGradients[activeCard % linearGradients.length]);
-  }, [activeCard]);
+    const observers: IntersectionObserver[] = [];
+
+    stepRefs.current.forEach((el, index) => {
+      if (!el) return;
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setActiveCard(index);
+          }
+        },
+        {
+          // Trigger when step enters center 40% of viewport
+          rootMargin: "-30% 0px -30% 0px",
+          threshold: 0.1,
+        }
+      );
+      observer.observe(el);
+      observers.push(observer);
+    });
+
+    return () => observers.forEach((o) => o.disconnect());
+  }, [content.length]);
 
   return (
-    <motion.div
-      animate={{
-        backgroundColor: backgroundColors[activeCard % backgroundColors.length],
-      }}
-      className="h-[40rem] overflow-y-auto flex justify-center relative space-x-10 rounded-xl p-10 md:p-16"
-      ref={ref}
-    >
-      <div className="div relative flex items-start px-4">
-        <div className="max-w-2xl">
+    <div ref={sectionRef} className="relative">
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-20">
+        {/* Left: scrolling text steps */}
+        <div className="relative">
           {content.map((item, index) => (
-            <div key={item.title + index} className="my-20">
-              <motion.h2
-                initial={{ opacity: 0 }}
-                animate={{ opacity: activeCard === index ? 1 : 0.3 }}
-                className="text-2xl font-bold text-[var(--color-ink-resolved)]"
+            <div
+              key={item.title + index}
+              ref={(el) => { stepRefs.current[index] = el; }}
+              className="py-20 first:pt-8 last:pb-8 lg:py-28 lg:first:pt-4 lg:last:pb-4"
+            >
+              <motion.div
+                animate={{
+                  opacity: activeCard === index ? 1 : 0.25,
+                }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
               >
-                {item.title}
-              </motion.h2>
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: activeCard === index ? 1 : 0.3 }}
-                className="text-lg text-[var(--color-ink-muted-resolved)] max-w-sm mt-10"
-              >
-                {item.description}
-              </motion.p>
+                <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+                  Step {index + 1}
+                </p>
+                <h3 className="text-2xl font-bold tracking-tight text-[var(--color-ink-resolved)] md:text-3xl">
+                  {item.title}
+                </h3>
+                <p className="mt-4 max-w-md text-base leading-relaxed text-[var(--color-ink-muted-resolved)] md:text-lg">
+                  {item.description}
+                </p>
+              </motion.div>
             </div>
           ))}
-          <div className="h-40" />
+        </div>
+
+        {/* Right: sticky visual panel */}
+        <div className="hidden lg:flex lg:items-start">
+          <div className="sticky top-28 w-full">
+            <div
+              className={cn(
+                "relative overflow-hidden rounded-[24px] bg-accent/[0.06] border border-accent/10",
+                "aspect-[4/3] w-full",
+                contentClassName
+              )}
+            >
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeCard}
+                  initial={{ opacity: 0, y: 12, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -12, scale: 0.98 }}
+                  transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                  className="absolute inset-0 flex items-center justify-center p-8"
+                >
+                  {content[activeCard].content ?? null}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </div>
         </div>
       </div>
-      <div
-        style={{ background: backgroundGradient }}
-        className={cn(
-          "hidden lg:block h-80 w-96 rounded-xl bg-white sticky top-10 overflow-hidden",
-          contentClassName
-        )}
-      >
-        {content[activeCard].content ?? null}
+
+      {/* Mobile: show active card inline below each step */}
+      <div className="lg:hidden">
+        <div
+          className={cn(
+            "overflow-hidden rounded-[20px] bg-accent/[0.06] border border-accent/10",
+            "aspect-[4/3] w-full",
+            contentClassName
+          )}
+        >
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeCard}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="flex h-full items-center justify-center p-6"
+            >
+              {content[activeCard].content ?? null}
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
-    </motion.div>
+    </div>
   );
 };

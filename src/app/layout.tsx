@@ -9,6 +9,9 @@ const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 export const metadata: Metadata = {
   title: "SpotAI — Smart Parking Finder",
   description: "AI-powered parking recommendations in Vancouver",
+  icons: {
+    icon: '/logo.svg',
+  },
 };
 
 export default function RootLayout({

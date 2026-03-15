@@ -4,20 +4,14 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ────────────────────────────────────────────────────────────
+   STATIC DESIGN TOKENS
+   These do NOT change between light/dark. They generate
+   Tailwind utilities like shadow-subtle, font-sans, etc.
+   ──────────────────────────────────────────────────────────── */
 @theme {
   /* Typography */
   --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
-
-  /* Brand colors */
-  --color-canvas: #050608;
-  --color-panel: #0c0f15;
-  --color-panel-light: #141821;
-  --color-ink: #f0ece4;
-  --color-ink-muted: #6b7280;
-  --color-accent: #d4915c;
-  --color-accent-light: #eab07a;
-  --color-success: #34d399;
-  --color-divider: #1a1e28;
 
   /* Spacing scale (4px base) */
   --spacing-1: 4px;
@@ -32,203 +26,307 @@
   --spacing-24: 96px;
   --spacing-32: 128px;
 
-  /* Border radius scale */
-  --radius-sm: 6px;
-  --radius-md: 12px;
-  --radius-lg: 20px;
-  --radius-full: 9999px;
-
   /* Shadows */
   --shadow-subtle: 0 1px 2px rgba(0,0,0,0.05);
   --shadow-medium: 0 4px 12px rgba(0,0,0,0.08);
   --shadow-strong: 0 8px 24px rgba(0,0,0,0.14);
 }
 
-/* ── Light mode (default) ── */
+/* ────────────────────────────────────────────────────────────
+   LIGHT MODE (default)
+   All theme-aware CSS variables live here.
+   ──────────────────────────────────────────────────────────── */
 :root {
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent-ui: #f3f4f6;
-  --accent-ui-foreground: #111827;
-  --destructive: oklch(0.577 0.245 27.325);
+  /* ── shadcn UI tokens ── */
+  --background: hsl(40 20% 97%);
+  --foreground: hsl(220 20% 12%);
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(220 20% 12%);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(220 20% 12%);
+  --primary: hsl(22 56% 59%);
+  --primary-foreground: #ffffff;
+  --secondary: hsl(144 14% 55%);
+  --secondary-foreground: hsl(220 20% 12%);
+  --muted: hsl(40 12% 93%);
+  --muted-foreground: hsl(220 10% 42%);
+  --accent-ui: hsl(22 56% 93%);
+  --accent-ui-foreground: hsl(220 20% 12%);
+  --destructive: hsl(0 84% 60%);
   --destructive-foreground: #ffffff;
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --border: hsl(40 10% 88%);
+  --input: hsl(40 10% 88%);
+  --ring: hsl(22 56% 59%);
   --radius: 0.625rem;
 
-  /* Map page specific */
-  --sidebar-bg: #ffffff;
-  --sidebar-border: oklch(0.922 0 0);
-  --search-bg: rgba(255, 255, 255, 0.92);
-  --search-border: #e5e7eb;
-  --control-bg: rgba(255, 255, 255, 0.92);
-  --control-border: #e5e7eb;
-  --card-bg: #ffffff;
-  --card-bg-hover: #f9fafb;
-  --card-border: #e5e7eb;
-  --card-border-hover: #d1d5db;
-  --badge-free-bg: #dcfce7;
-  --badge-free-text: #15803d;
-  --badge-paid-bg: #fef3c7;
-  --badge-paid-text: #92400e;
-  --badge-ev-bg: #dbeafe;
-  --badge-ev-text: #1d4ed8;
-  --badge-unknown-bg: #f3f4f6;
-  --badge-unknown-text: #4b5563;
-  --recommended-bg: #fdf6f0;
-  --recommended-border: #eab07a;
-  --ai-text: #b06e2a;
-  --text-primary: #111827;
-  --text-secondary: #6b7280;
-  --text-tertiary: #9ca3af;
-  --btn-primary-bg: #d4915c;
-  --btn-primary-hover: #c07a45;
-  --btn-primary-text: #ffffff;
-  --filter-active-bg: #d4915c;
-  --filter-active-text: #ffffff;
-  --filter-bg: #f3f4f6;
-  --filter-text: #4b5563;
-  --filter-hover: #e5e7eb;
-  --skeleton-bg: #f3f4f6;
-  --empty-text: #6b7280;
-  --error-bg: #fef2f2;
-  --error-border: #fca5a5;
-  --error-text: #b91c1c;
+  /* ── Brand colors (used as text-accent, bg-success, etc.) ── */
+  --brand-accent: hsl(22 56% 59%);
+  --brand-accent-light: hsl(22 45% 52%);
+  --brand-success: hsl(144 14% 55%);
+  --brand-canvas: hsl(40 20% 97%);
 
-  /* Glassmorphism for light mode */
+  /* ── Landing page resolved vars (used via var() in components) ── */
+  --color-canvas-resolved: hsl(40 20% 97%);
+  --color-panel-resolved: #ffffff;
+  --color-panel-light-resolved: hsl(40 12% 95%);
+  --color-ink-resolved: hsl(220 20% 12%);
+  --color-ink-muted-resolved: hsl(220 10% 42%);
+
+  /* Accent RGB for rgba() usage */
+  --accent-rgb: 191, 120, 77;
+
+  /* ── Map page ── */
+  --sidebar-bg: #ffffff;
+  --sidebar-border: hsl(40 10% 88%);
+  --search-bg: hsla(40, 20%, 97%, 0.92);
+  --search-border: hsl(40 10% 88%);
+  --control-bg: hsla(40, 20%, 97%, 0.92);
+  --control-border: hsl(40 10% 88%);
+  --card-bg: #ffffff;
+  --card-border: hsl(40 10% 88%);
+
+  /* Badge colors — amber/green/muted only */
+  --badge-free-bg: hsl(144 20% 92%);
+  --badge-free-text: hsl(144 30% 32%);
+  --badge-paid-bg: hsl(22 50% 93%);
+  --badge-paid-text: hsl(22 60% 35%);
+  --badge-ev-bg: hsl(144 14% 90%);
+  --badge-ev-text: hsl(144 20% 38%);
+  --badge-unknown-bg: hsl(40 8% 93%);
+  --badge-unknown-text: hsl(220 10% 40%);
+
+  /* Text hierarchy */
+  --ai-text: hsl(22 56% 40%);
+  --text-primary: hsl(220 20% 12%);
+  --text-secondary: hsl(220 10% 42%);
+  --text-tertiary: hsl(220 8% 58%);
+
+  /* Buttons */
+  --btn-primary-bg: hsl(22 56% 59%);
+  --btn-primary-text: #ffffff;
+  --btn-secondary-bg: hsl(40 12% 96%);
+  --btn-secondary-text: hsl(220 15% 25%);
+  --btn-secondary-border: hsl(40 10% 88%);
+
+  /* Filters */
+  --filter-active-bg: hsl(22 56% 59%);
+  --filter-active-text: #ffffff;
+  --filter-bg: hsl(40 12% 93%);
+  --filter-text: hsl(220 10% 35%);
+  --filter-hover: hsl(40 10% 88%);
+
+  /* Misc */
+  --skeleton-bg: hsl(40 12% 93%);
+  --empty-text: hsl(220 10% 42%);
+  --error-bg: hsl(0 70% 97%);
+  --error-border: hsl(0 60% 75%);
+  --error-text: hsl(0 60% 40%);
+
+  /* Glassmorphism */
   --glass-bg: rgba(255, 255, 255, 0.65);
   --glass-border: rgba(255, 255, 255, 0.8);
   --glass-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+
+  /* Chart colors — amber/green palette only */
+  --chart-1: hsl(22 56% 59%);
+  --chart-2: hsl(144 14% 55%);
+  --chart-3: hsl(22 40% 72%);
+  --chart-4: hsl(144 12% 68%);
+  --chart-5: hsl(22 30% 45%);
+
+  /* Sidebar (shadcn) */
+  --sidebar: hsl(40 20% 97%);
+  --sidebar-foreground: hsl(220 20% 12%);
+  --sidebar-primary: hsl(22 56% 59%);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: hsl(22 56% 93%);
+  --sidebar-accent-foreground: hsl(220 20% 12%);
+  --sidebar-ring: hsl(22 56% 59%);
 }
 
-/* ── Dark mode ── */
+/* ────────────────────────────────────────────────────────────
+   DARK MODE
+   ──────────────────────────────────────────────────────────── */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent-ui: #1a1e28;
-  --accent-ui-foreground: #f0ece4;
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: #f0ece4;
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  /* ── shadcn UI tokens ── */
+  --background: hsl(222 47% 7%);
+  --foreground: hsl(40 20% 92%);
+  --card: hsl(222 35% 11%);
+  --card-foreground: hsl(40 20% 92%);
+  --popover: hsl(222 35% 11%);
+  --popover-foreground: hsl(40 20% 92%);
+  --primary: hsl(22 60% 67%);
+  --primary-foreground: hsl(222 47% 7%);
+  --secondary: hsl(144 18% 58%);
+  --secondary-foreground: hsl(40 20% 92%);
+  --muted: hsl(222 25% 13%);
+  --muted-foreground: hsl(220 10% 55%);
+  --accent-ui: hsl(222 25% 13%);
+  --accent-ui-foreground: hsl(40 20% 92%);
+  --destructive: hsl(0 84% 60%);
+  --destructive-foreground: hsl(40 20% 92%);
+  --border: hsl(222 18% 16%);
+  --input: hsl(222 18% 18%);
+  --ring: hsl(22 60% 67%);
 
-  /* Map page specific */
-  --sidebar-bg: #0c0f15;
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --search-bg: rgba(12, 15, 21, 0.92);
-  --search-border: #1a1e28;
-  --control-bg: rgba(12, 15, 21, 0.92);
-  --control-border: #1a1e28;
-  --card-bg: #111520;
-  --card-bg-hover: #161b28;
-  --card-border: #1a1e28;
-  --card-border-hover: #2a3040;
-  --badge-free-bg: rgba(34, 197, 94, 0.15);
-  --badge-free-text: #4ade80;
-  --badge-paid-bg: rgba(245, 158, 11, 0.15);
-  --badge-paid-text: #fbbf24;
-  --badge-ev-bg: rgba(59, 130, 246, 0.15);
-  --badge-ev-text: #60a5fa;
-  --badge-unknown-bg: rgba(107, 114, 128, 0.15);
-  --badge-unknown-text: #9ca3af;
-  --recommended-bg: rgba(212, 145, 92, 0.1);
-  --recommended-border: #d4915c;
-  --ai-text: #eab07a;
-  --text-primary: #f0ece4;
-  --text-secondary: #9ca3af;
-  --text-tertiary: #6b7280;
-  --btn-primary-bg: #d4915c;
-  --btn-primary-hover: #eab07a;
-  --btn-primary-text: #050608;
-  --filter-active-bg: #d4915c;
-  --filter-active-text: #050608;
-  --filter-bg: #1a1e28;
-  --filter-text: #9ca3af;
-  --filter-hover: #252a38;
-  --skeleton-bg: #1a1e28;
-  --empty-text: #6b7280;
-  --error-bg: rgba(239, 68, 68, 0.1);
-  --error-border: #7f1d1d;
-  --error-text: #fca5a5;
+  /* ── Brand colors ── */
+  --brand-accent: hsl(22 60% 67%);
+  --brand-accent-light: hsl(22 55% 74%);
+  --brand-success: hsl(144 18% 58%);
+  --brand-canvas: hsl(222 47% 7%);
 
-  /* Glassmorphism for dark mode */
+  /* ── Landing page resolved vars ── */
+  --color-canvas-resolved: hsl(222 47% 7%);
+  --color-panel-resolved: hsl(222 35% 11%);
+  --color-panel-light-resolved: hsl(222 28% 14%);
+  --color-ink-resolved: hsl(40 20% 92%);
+  --color-ink-muted-resolved: hsl(220 10% 42%);
+
+  /* Accent RGB for rgba() usage */
+  --accent-rgb: 214, 155, 110;
+
+  /* ── Map page ── */
+  --sidebar-bg: hsl(222 35% 8%);
+  --sidebar-border: hsl(222 18% 16%);
+  --search-bg: hsla(222, 35%, 8%, 0.92);
+  --search-border: hsl(222 18% 16%);
+  --control-bg: hsla(222, 35%, 8%, 0.92);
+  --control-border: hsl(222 18% 16%);
+  --card-bg: hsl(222 30% 10%);
+  --card-border: hsl(222 18% 16%);
+
+  /* Badge colors — amber/green/muted only */
+  --badge-free-bg: hsla(144, 18%, 58%, 0.15);
+  --badge-free-text: hsl(144 18% 65%);
+  --badge-paid-bg: hsla(22, 60%, 67%, 0.15);
+  --badge-paid-text: hsl(22 60% 72%);
+  --badge-ev-bg: hsla(144, 14%, 55%, 0.15);
+  --badge-ev-text: hsl(144 18% 62%);
+  --badge-unknown-bg: hsla(220, 10%, 42%, 0.15);
+  --badge-unknown-text: hsl(220 8% 58%);
+
+  /* Text hierarchy */
+  --ai-text: hsl(22 56% 72%);
+  --text-primary: hsl(40 20% 92%);
+  --text-secondary: hsl(220 8% 58%);
+  --text-tertiary: hsl(220 10% 42%);
+
+  /* Buttons */
+  --btn-primary-bg: hsl(22 60% 67%);
+  --btn-primary-text: hsl(222 47% 7%);
+  --btn-secondary-bg: hsl(222 25% 13%);
+  --btn-secondary-text: hsl(40 20% 92%);
+  --btn-secondary-border: hsl(222 18% 20%);
+
+  /* Filters */
+  --filter-active-bg: hsl(22 60% 67%);
+  --filter-active-text: hsl(222 47% 7%);
+  --filter-bg: hsl(222 25% 13%);
+  --filter-text: hsl(220 8% 58%);
+  --filter-hover: hsl(222 22% 17%);
+
+  /* Misc */
+  --skeleton-bg: hsl(222 25% 13%);
+  --empty-text: hsl(220 10% 42%);
+  --error-bg: hsla(0, 84%, 60%, 0.1);
+  --error-border: hsl(0 50% 25%);
+  --error-text: hsl(0 60% 75%);
+
+  /* Glassmorphism */
   --glass-bg: rgba(30, 30, 30, 0.6);
   --glass-border: rgba(255, 255, 255, 0.1);
   --glass-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-ring: oklch(0.556 0 0);
+
+  /* Chart colors — amber/green palette only */
+  --chart-1: hsl(22 60% 67%);
+  --chart-2: hsl(144 18% 58%);
+  --chart-3: hsl(22 45% 55%);
+  --chart-4: hsl(144 14% 48%);
+  --chart-5: hsl(22 35% 42%);
+
+  /* Sidebar (shadcn) */
+  --sidebar: hsl(222 35% 9%);
+  --sidebar-foreground: hsl(40 20% 92%);
+  --sidebar-primary: hsl(22 60% 67%);
+  --sidebar-primary-foreground: hsl(40 20% 92%);
+  --sidebar-accent: hsl(222 25% 13%);
+  --sidebar-accent-foreground: hsl(40 20% 92%);
+  --sidebar-ring: hsl(22 60% 67%);
 }
 
-/* ── Brand tokens resolved by theme ── */
-:root {
-  --color-canvas-resolved: #faf8f5;
-  --color-panel-resolved: #ffffff;
-  --color-panel-light-resolved: #f5f3f0;
-  --color-ink-resolved: #1a1a1a;
-  --color-ink-muted-resolved: #6b7280;
+/* ────────────────────────────────────────────────────────────
+   THEME-AWARE TAILWIND TOKENS
+   Maps CSS vars → Tailwind utility classes.
+   @theme inline means these adapt when :root/.dark vars change.
+   ──────────────────────────────────────────────────────────── */
+@theme inline {
+  --font-sans: var(--font-sans);
 
-  /* Accent RGB for rgba() usage */
-  --accent-rgb: 212, 145, 92;
+  /* Brand colors → text-accent, bg-accent, text-success, etc. */
+  --color-accent: var(--brand-accent);
+  --color-accent-light: var(--brand-accent-light);
+  --color-success: var(--brand-success);
+  --color-canvas: var(--brand-canvas);
+
+  /* shadcn UI tokens → text-primary, bg-card, etc. */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent-ui: var(--accent-ui);
+  --color-accent-ui-foreground: var(--accent-ui-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Chart */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* Sidebar */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Radius scale (shadcn uses --radius as base) */
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
-.dark {
-  --color-canvas-resolved: #050608;
-  --color-panel-resolved: #0c0f15;
-  --color-panel-light-resolved: #141821;
-  --color-ink-resolved: #f0ece4;
-  --color-ink-muted-resolved: #6b7280;
 
-  --accent-rgb: 234, 176, 122;
+/* ────────────────────────────────────────────────────────────
+   BASE STYLES
+   ──────────────────────────────────────────────────────────── */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+  }
 }
 
-/* ── Base styles ── */
 body {
   background-color: var(--color-canvas-resolved);
   color: var(--color-ink-resolved);
@@ -237,14 +335,15 @@ body {
   line-height: 1.6;
 }
 
-/* Typography */
 h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
   letter-spacing: -0.025em;
   line-height: 1.1;
 }
 
-/* Container utility */
+/* ────────────────────────────────────────────────────────────
+   LAYOUT UTILITIES
+   ──────────────────────────────────────────────────────────── */
 .container-landing {
   max-width: 1200px;
   margin: 0 auto;
@@ -266,7 +365,6 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-/* Section padding */
 .section-padding {
   padding-top: 48px;
   padding-bottom: 48px;
@@ -286,7 +384,9 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-/* Glassmorphism utilities */
+/* ────────────────────────────────────────────────────────────
+   COMPONENT UTILITIES
+   ──────────────────────────────────────────────────────────── */
 .glass-card {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
@@ -295,85 +395,34 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-backdrop-filter: blur(12px);
 }
 
-/* Leaflet map overrides */
+/* ────────────────────────────────────────────────────────────
+   LEAFLET MAP OVERRIDES
+   ──────────────────────────────────────────────────────────── */
 .leaflet-container {
   width: 100%;
   height: 100%;
   z-index: 1;
 }
 
-/* Leaflet popup styling for dark mode */
 .dark .leaflet-popup-content-wrapper {
-  background: #111520;
-  color: #f0ece4;
-  border: 1px solid #1e2330;
+  background: hsl(222 30% 10%);
+  color: hsl(40 20% 92%);
+  border: 1px solid hsl(222 18% 16%);
 }
 .dark .leaflet-popup-tip {
-  background: #111520;
+  background: hsl(222 30% 10%);
 }
 
-/* Smooth theme transition */
+/* ────────────────────────────────────────────────────────────
+   SMOOTH THEME TRANSITION
+   ──────────────────────────────────────────────────────────── */
 * {
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
-/* Exclude map tiles and markers from transition */
+/* Exclude map elements from theme transition */
 .leaflet-tile,
 .leaflet-marker-icon,
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip {
   transition: none !important;
-}
-
-@theme inline {
-  --font-sans: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --color-foreground: var(--foreground);
-  --color-background: var(--background);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
-}
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-  html {
-    @apply font-sans;
-  }
 }
