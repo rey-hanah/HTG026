@@ -16,7 +16,8 @@ export async function GET(request: NextRequest) {
     const radiusM = parseInt(radiusParam);
 
     // Vancouver Open Data - geo_point_2d works for distance filter
-    const url = `https://opendata.vancouver.ca/api/explore/v2.1/catalog/datasets/parking-meters/records?limit=50&where=within_distance(geo_point_2d,GEOM'POINT(${lngNum} ${latNum})',${radiusM}m)`;
+    // Only fetch meters that are "In Service"
+    const url = `https://opendata.vancouver.ca/api/explore/v2.1/catalog/datasets/parking-meters/records?limit=100&where=within_distance(geo_point_2d,GEOM'POINT(${lngNum} ${latNum})',${radiusM}m) AND service_status="In Service"`;
 
     const res = await fetch(url, {
       headers: { "User-Agent": "SpotAI/1.0" },
@@ -117,10 +118,16 @@ function parseMeters(results: any[]) {
           timeLimit += `, ${m.time_limit_6pm_10pm} (6pm–10pm)`;
       }
 
+      // Build descriptive name
+      const headType = m.meter_head || "";
+      const payMethod = m.credit_card === "Yes" ? "Card accepted" : "Coins/mobile only";
+
       return {
         id: `meter-${m.meter_id || m.object_id || Math.random()}`,
         name: `Street Parking${area ? ` – ${area}` : ""}`,
-        address: m.meter_id ? `Meter #${m.meter_id}` : "",
+        address: m.meter_id
+          ? `Meter #${m.meter_id}${headType ? ` · ${headType}` : ""} · ${payMethod}`
+          : "",
         type: "paid" as const,
         lat: mLat,
         lng: mLng,

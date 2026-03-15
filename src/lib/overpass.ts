@@ -1,4 +1,5 @@
 import { ParkingSpot } from "@/types/parking";
+import { getOperatorRates } from "@/lib/operatorPricing";
 
 export async function fetchParkingFromOSM(lat: number, lng: number, radius: number = 500): Promise<ParkingSpot[]> {
   const query = `
@@ -45,10 +46,28 @@ export async function fetchParkingFromOSM(lat: number, lng: number, radius: numb
         name = `Parking ${parkingType.charAt(0).toUpperCase() + parkingType.slice(1)}`;
       }
       
-      // Get rate
+      // Get rate — try tag data first, then operator lookup
       let rate = "Free";
+      let rateDetails: { daytime?: string; evening?: string; weekend?: string } | undefined;
       if (isPaid) {
-        rate = tags["fee:amount"] || tags.charge || "Paid (check sign)";
+        if (tags["fee:amount"] || tags.charge) {
+          rate = tags["fee:amount"] || tags.charge;
+        } else {
+          // No explicit rate in OSM — try operator-based lookup
+          const operatorName = tags.operator || tags.name || "";
+          const opRates = getOperatorRates(operatorName);
+          if (opRates) {
+            rate = opRates.summary;
+            rateDetails = {};
+            if (opRates.hourly) rateDetails.daytime = opRates.hourly;
+            if (opRates.evening) rateDetails.evening = opRates.evening;
+            if (opRates.daily) rateDetails.weekend = `Daily: ${opRates.daily}`;
+          } else {
+            rate = operatorName
+              ? `Paid · ${operatorName} (see sign)`
+              : "Paid (see sign for rates)";
+          }
+        }
       }
 
       return {
@@ -59,9 +78,11 @@ export async function fetchParkingFromOSM(lat: number, lng: number, radius: numb
         lat: spotLat,
         lng: spotLng,
         rate,
+        rateDetails,
         timeLimit: tags.maxstay || undefined,
         capacity: tags.capacity ? parseInt(tags.capacity) : undefined,
         access: tags.access,
+        operator: tags.operator || undefined,
         source: "overpass" as const,
       };
     }).filter((s: any) => s.lat && s.lng);

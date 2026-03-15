@@ -147,7 +147,20 @@ export default function Home() {
         evChargers.length
       );
 
-      const allSpots: ParkingSpot[] = [...osmSpots, ...meters, ...evChargers];
+      // De-duplicate meters that are within ~30 m of each other.
+      // Keep the first one encountered (closest to destination after sorting).
+      const dedupeDistance = 0.0003; // ~30 m in lat/lng degrees
+      const dedupedMeters: ParkingSpot[] = [];
+      for (const m of meters) {
+        const isDupe = dedupedMeters.some(
+          (existing) =>
+            Math.abs(existing.lat - m.lat) < dedupeDistance &&
+            Math.abs(existing.lng - m.lng) < dedupeDistance
+        );
+        if (!isDupe) dedupedMeters.push(m);
+      }
+
+      const allSpots: ParkingSpot[] = [...osmSpots, ...dedupedMeters, ...evChargers];
 
       if (allSpots.length === 0) {
         setError("No parking found nearby. Try increasing the radius or a different location.");
@@ -155,7 +168,7 @@ export default function Home() {
         return;
       }
 
-      // Calculate straight-line distance and sort
+      // Attach straight-line distance for sorting
       const spotsWithDistance = allSpots.map((spot) => ({
         ...spot,
         straightDistance: Math.sqrt(
@@ -163,8 +176,34 @@ export default function Home() {
         ),
       }));
 
-      spotsWithDistance.sort((a, b) => a.straightDistance - b.straightDistance);
-      const topSpots = spotsWithDistance.slice(0, 10);
+      // Sort each source by distance, then interleave to guarantee diversity
+      const bySource: Record<string, typeof spotsWithDistance> = {};
+      for (const s of spotsWithDistance) {
+        const key = s.source;
+        if (!bySource[key]) bySource[key] = [];
+        bySource[key].push(s);
+      }
+      for (const key of Object.keys(bySource)) {
+        bySource[key].sort((a, b) => a.straightDistance - b.straightDistance);
+      }
+
+      // Round-robin pick from each source to build a diverse top 15
+      const topSpots: typeof spotsWithDistance = [];
+      const sources = Object.keys(bySource);
+      const indices: Record<string, number> = {};
+      sources.forEach((s) => (indices[s] = 0));
+
+      while (topSpots.length < 15) {
+        let added = false;
+        for (const src of sources) {
+          if (indices[src] < bySource[src].length && topSpots.length < 15) {
+            topSpots.push(bySource[src][indices[src]]);
+            indices[src]++;
+            added = true;
+          }
+        }
+        if (!added) break; // all sources exhausted
+      }
 
       // Batch fetch walk times
       console.log("Calculating walk times...");

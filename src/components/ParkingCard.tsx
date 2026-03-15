@@ -300,7 +300,7 @@ export default function ParkingCard({
                       className="w-3 h-3 shrink-0"
                       style={{ color: "var(--badge-free-text)" }}
                     />
-                    <span>Free 24/7</span>
+                    <span>No posted time limit</span>
                   </div>
                 )}
               </>
@@ -542,7 +542,7 @@ export default function ParkingCard({
                           <p>{spot.timeLimit}</p>
                         )}
                         {!spot.timeLimitDetails && !spot.timeLimit && (
-                          <p>Free 24/7</p>
+                          <p>No posted time limit</p>
                         )}
                       </div>
                     </div>

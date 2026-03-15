@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 
+// OSRM returns ideal no-traffic driving durations.
+// Apply a multiplier to approximate real-world urban Vancouver traffic.
+// 1.5x is a reasonable average — peak hours may be 2x, off-peak ~1.2x.
+const TRAFFIC_MULTIPLIER = 1.5;
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const fromLat = searchParams.get("fromLat");
@@ -31,8 +36,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ duration: null, distance: null });
     }
 
+    // Apply traffic multiplier to get a more realistic estimate
+    const rawDuration = data.routes[0].duration; // seconds
+    const adjustedDuration = Math.round(rawDuration * TRAFFIC_MULTIPLIER);
+
     return NextResponse.json({
-      duration: data.routes[0].duration,
+      duration: adjustedDuration,
       distance: data.routes[0].distance,
     });
   } catch (e) {
