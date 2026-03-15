@@ -161,7 +161,7 @@ export default function FooterCTA() {
           {/* Bottom bar */}
           <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-[var(--color-ink-resolved)]/[0.06] pt-8 sm:flex-row">
             <p className="text-xs text-[var(--color-ink-muted-resolved)]">
-              Built for HTG 2026. Open source and free to use.
+              Built for Vancouver drivers, at a hackathon, in one night.
             </p>
             <p className="text-xs text-[var(--color-ink-muted-resolved)]">
               Powered by Vancouver Open Data, OpenStreetMap, and Gemini AI.

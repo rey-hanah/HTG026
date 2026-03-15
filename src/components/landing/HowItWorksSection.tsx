@@ -292,27 +292,27 @@ function VisualStep4() {
    ──────────────────────────────────────────────────── */
 const content = [
   {
-    title: "Enter Your Destination",
+    title: "Type where you're going",
     description:
-      "Type any address or landmark in Vancouver. We geocode it instantly with Nominatim and center the map on your destination — ready to search for parking in the area.",
+      "Any address. Any landmark. 'Cafe Medina' works. So does 'Science World'. We geocode it instantly and center the map on your destination.",
     content: <VisualStep1 />,
   },
   {
-    title: "We Search 5 APIs at Once",
+    title: "We search everywhere",
     description:
-      "Overpass, Vancouver Open Data, Open Charge Map, OSRM, and more — we query free street spots, paid lots, and EV chargers simultaneously so no option goes unnoticed.",
+      "Street parking, paid lots, EV chargers — five sources queried in parallel, in about two seconds. No option goes unchecked.",
     content: <VisualStep2 />,
   },
   {
-    title: "Gemini AI Ranks Results",
+    title: "The AI picks one",
     description:
-      "Our AI considers time of day, walk distance, pricing, and availability patterns to recommend the single best option for your specific situation — not just the closest spot.",
+      "Gemini reads the results, weighs your constraints, and surfaces one recommendation with a reason. Not a list — one answer.",
     content: <VisualStep3 />,
   },
   {
-    title: "Navigate to Your Spot",
+    title: "Tap. Go. Park.",
     description:
-      "One tap opens walking directions in Google Maps. You save time, money, and emissions — every single trip. From search to parked in under a minute.",
+      "One tap opens walking directions. From search to parked in under a minute.",
     content: <VisualStep4 />,
   },
 ];
@@ -336,7 +336,7 @@ export default function HowItWorksSection() {
             </span>
           </h2>
           <p className="mt-4 text-[var(--color-ink-muted-resolved)] text-lg">
-            From search to parked in under a minute.
+            Search to parked in under a minute.
           </p>
         </div>
 

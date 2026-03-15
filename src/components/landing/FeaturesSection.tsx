@@ -20,19 +20,19 @@ const features: Feature[] = [
     icon: Brain,
     title: "AI-Powered Rankings",
     description:
-      "Gemini AI considers time of day, walk distance, pricing, and availability patterns to recommend the single best parking spot for you.",
+      "Tell us where you're going and when. Gemini reads your constraints — budget, EV, time limit — and picks one spot. With a reason.",
   },
   {
     icon: Radio,
     title: "Real-Time Data",
     description:
-      "Live queries across free street parking, paid lots, and EV chargers — updated every search so you never get stale results.",
+      "Every search queries live city data. No cached results, no stale meters, no surprises when you arrive.",
   },
   {
     icon: Layers,
     title: "Multi-Source Coverage",
     description:
-      "We search 5 APIs simultaneously — Overpass, Vancouver Open Data, Open Charge Map, OSRM, and more — so no spot goes unnoticed.",
+      "Google Maps shows you Impark. We also show you the free street spot two blocks east, the EV charger around the corner, and how long each takes to walk to.",
   },
 ];
 
@@ -74,13 +74,13 @@ export default function FeaturesSection() {
             Why SpotAI
           </span>
           <h2 className="mt-4 text-balance font-display text-3xl font-bold tracking-tight text-[var(--color-ink-resolved)] md:text-4xl lg:text-5xl">
-            Built for smarter{" "}
+            Everything Google Maps{" "}
             <span className="bg-gradient-to-r from-accent to-accent-light bg-clip-text text-transparent">
-              parking.
+              skips.
             </span>
           </h2>
           <p className="mt-4 text-[var(--color-ink-muted-resolved)] text-lg">
-            Three core pillars that make SpotAI different from any maps app.
+            Three things SpotAI does that your maps app doesn't.
           </p>
         </div>
 
